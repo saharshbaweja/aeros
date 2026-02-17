@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, PlaneTakeoff, BarChart3, Plane } from "lucide-react";
-import { ChatMessage } from "@/types";
 import { mockFlights, mockAlerts, mockAircraft, mockWeather } from "@/lib/mock-data";
 import { getGreeting, formatTime, getServiceTypeLabel } from "@/lib/utils";
 import AlertCard from "@/components/alert-card";
-import ChatThread from "@/components/chat-thread";
 import WeatherCard from "@/components/weather-card";
 import Link from "next/link";
 
@@ -21,95 +18,18 @@ export default function DashboardPage() {
 }
 
 function DashboardContent() {
-  const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("q");
-
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [alerts, setAlerts] = useState(mockAlerts.filter((a) => a.status === "active"));
-  const [showChat, setShowChat] = useState(false);
 
   const scheduledFlights = mockFlights.filter((f) => f.status === "scheduled");
   const completedFlights = mockFlights.filter((f) => f.status === "completed");
   const totalRevenue = (scheduledFlights.length * 245 + completedFlights.length * 280);
-
-  const handleSendMessage = useCallback(
-    async (content: string) => {
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: "user",
-        content,
-        timestamp: new Date().toISOString(),
-      };
-
-      setMessages((prev) => [...prev, userMessage]);
-      setShowChat(true);
-      setIsLoading(true);
-
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [...messages, userMessage].map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
-          }),
-        });
-
-        const data = await res.json();
-
-        const aiMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: data.message || "I'm having trouble connecting. Please check that the OpenAI API key is configured.",
-          timestamp: new Date().toISOString(),
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
-      } catch {
-        const errorMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content:
-            "I'm currently running in demo mode. To enable AI responses, add your OpenAI API key to .env.local.\n\nHere's what I can tell you:\n- You have " +
-            scheduledFlights.length +
-            " flights scheduled today\n- " +
-            alerts.length +
-            " active alerts need attention\n- Weather is " +
-            mockWeather.flight_category,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [messages, scheduledFlights.length, alerts.length]
-  );
-
-  // Handle initial query from command bar
-  useEffect(() => {
-    if (initialQuery) {
-      handleSendMessage(initialQuery);
-      // Clean URL
-      window.history.replaceState(null, "", "/");
-    }
-    // Only run on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleDismissAlert = (id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
 
   const handleAlertAction = (id: string, action: string) => {
-    const alert = alerts.find((a) => a.id === id);
-    if (alert) {
-      handleSendMessage(`Handle alert: ${alert.message}`);
-      handleDismissAlert(id);
-    }
+    handleDismissAlert(id);
   };
 
   return (
@@ -261,12 +181,13 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="flex items-center gap-3 mb-6"
+            className="flex items-center gap-3"
           >
             <span className="text-xs text-gray-600">Quick actions:</span>
             {[
               { label: "Today's flights", href: "/flights" },
-              { label: "Track aircraft", href: "/aircraft" },
+              { label: "Track aircraft", href: "/map" },
+              { label: "View pricing", href: "/pricing" },
             ].map((action) => (
               <Link
                 key={action.href}
@@ -277,37 +198,6 @@ function DashboardContent() {
               </Link>
             ))}
           </motion.div>
-
-          {/* Chat area */}
-          {showChat && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-surface-200 border border-surface-400 rounded-xl overflow-hidden"
-              style={{ height: "400px" }}
-            >
-              <ChatThread
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-              />
-            </motion.div>
-          )}
-
-          {/* Always visible chat input when chat isn't open */}
-          {!showChat && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <ChatThread
-                messages={[]}
-                onSendMessage={handleSendMessage}
-                isLoading={false}
-              />
-            </motion.div>
-          )}
         </div>
       </div>
     </div>
