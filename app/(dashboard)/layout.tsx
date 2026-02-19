@@ -6,14 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plane,
   LayoutDashboard,
-  Calendar,
+  Radio,
   PlaneTakeoff,
   Settings,
   Command,
   HelpCircle,
   MessageCircle,
   X,
-  DollarSign,
+  Users,
   Map,
 } from "lucide-react";
 import CommandBar from "@/components/command-bar";
@@ -24,10 +24,10 @@ import Link from "next/link";
 
 const navItems = [
   { href: "/", icon: LayoutDashboard, label: "Home", shortcut: "1" },
-  { href: "/flights", icon: Calendar, label: "Flights", shortcut: "2" },
+  { href: "/dispatch", icon: Radio, label: "Dispatch", shortcut: "2" },
   { href: "/map", icon: Map, label: "Map", shortcut: "3" },
-  { href: "/aircraft", icon: PlaneTakeoff, label: "Aircraft", shortcut: "4" },
-  { href: "/pricing", icon: DollarSign, label: "Pricing", shortcut: "5" },
+  { href: "/aircraft", icon: PlaneTakeoff, label: "Fleet", shortcut: "4" },
+  { href: "/customers", icon: Users, label: "Customers", shortcut: "5" },
   { href: "/settings", icon: Settings, label: "Settings", shortcut: "," },
 ];
 
