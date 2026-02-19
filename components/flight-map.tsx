@@ -1,51 +1,64 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { Aircraft } from "@/types";
-import { mockAircraft } from "@/lib/mock-data";
+import { useEffect, useRef, useCallback } from "react";
+import type { Aircraft } from "@/types";
+import type { AdsbAircraft } from "@/app/api/adsb/route";
+import type L from "leaflet";
 
-// Simulated aircraft positions around KPDK (DeKalb-Peachtree Airport, Atlanta)
-const simulatedPositions: Record<
-  string,
-  { lat: number; lng: number; heading: number; altitude: number; speed: number }
-> = {
-  "ac-4": {
-    lat: 33.89,
-    lng: -84.3,
-    heading: 45,
-    altitude: 3500,
-    speed: 120,
-  },
-};
+interface FlightMapProps {
+  adsbAircraft: AdsbAircraft[];
+  fleet: Aircraft[];
+  filter: "all" | "fleet" | "traffic";
+  selectedIcao: string | null;
+  onSelectAircraft: (icao: string | null) => void;
+}
 
-// Airport location (KPDK)
+// KPDK
 const AIRPORT = { lat: 33.8756, lng: -84.3024 };
 
-export default function FlightMap() {
+export default function FlightMap({
+  adsbAircraft,
+  fleet,
+  filter,
+  selectedIcao,
+  onSelectAircraft,
+}: FlightMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
   const leafletMap = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.LayerGroup | null>(null);
+  const leafletRef = useRef<typeof L | null>(null);
+  const initRef = useRef(false);
 
-  const flyingAircraft = mockAircraft.filter((a) => a.status === "flying");
+  const fleetIcaos = new Set(
+    fleet.filter((a) => a.icao24_hex).map((a) => a.icao24_hex!.toLowerCase())
+  );
 
+  const getFleetAircraft = useCallback(
+    (icao: string) => fleet.find((a) => a.icao24_hex?.toLowerCase() === icao.toLowerCase()),
+    [fleet]
+  );
+
+  // Init map once
   useEffect(() => {
-    if (!mapRef.current || mapLoaded) return;
+    if (!mapRef.current || initRef.current) return;
+    initRef.current = true;
 
     let cancelled = false;
 
     const loadMap = async () => {
-      const L = (await import("leaflet")).default;
+      const Leaflet = (await import("leaflet")).default;
 
       if (cancelled || !mapRef.current) return;
 
-      const map = L.map(mapRef.current, {
+      leafletRef.current = Leaflet;
+
+      const map = Leaflet.map(mapRef.current, {
         zoomControl: false,
       }).setView([AIRPORT.lat, AIRPORT.lng], 11);
 
-      L.control.zoom({ position: "bottomright" }).addTo(map);
+      Leaflet.control.zoom({ position: "bottomright" }).addTo(map);
 
-      // Dark tile layer
-      L.tileLayer(
+      Leaflet.tileLayer(
         "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         {
           attribution:
@@ -55,184 +68,201 @@ export default function FlightMap() {
       ).addTo(map);
 
       // Airport marker
-      const airportIcon = L.divIcon({
+      const airportIcon = Leaflet.divIcon({
         className: "custom-marker",
         html: `<div style="
-          width: 32px; height: 32px;
-          background: rgba(99, 102, 241, 0.25);
-          border: 2px solid rgba(99, 102, 241, 0.6);
+          width: 40px; height: 40px;
+          background: rgba(99, 102, 241, 0.15);
+          border: 2px solid rgba(99, 102, 241, 0.5);
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+          box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
         ">
-          <div style="width: 8px; height: 8px; background: #818cf8; border-radius: 50%;"></div>
+          <div style="width: 12px; height: 12px; background: #818cf8; border-radius: 50%; box-shadow: 0 0 8px #818cf8;"></div>
         </div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
       });
 
-      L.marker([AIRPORT.lat, AIRPORT.lng], { icon: airportIcon })
+      Leaflet.marker([AIRPORT.lat, AIRPORT.lng], { icon: airportIcon })
         .addTo(map)
         .bindPopup(
-          `<div style="font-family: sans-serif; color: #fff; background: #1a1a2e; padding: 12px; border-radius: 8px; min-width: 140px;">
-            <div style="font-weight: 600; margin-bottom: 4px;">KPDK</div>
-            <div style="font-size: 11px; color: #9ca3af;">DeKalb-Peachtree Airport</div>
-            <div style="font-size: 11px; color: #9ca3af;">Atlanta, GA</div>
+          `<div style="font-family: system-ui, sans-serif; color: #fff; background: #111827; padding: 14px 16px; border-radius: 10px; min-width: 180px; border: 1px solid #1f2937;">
+            <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">KPDK</div>
+            <div style="font-size: 12px; color: #9ca3af;">DeKalb-Peachtree Airport</div>
+            <div style="font-size: 12px; color: #6b7280;">Atlanta, Georgia</div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #1f2937; font-size: 11px; color: #6b7280;">
+              Elev: 1,003ft &bull; Rwy 3L/21R, 3R/21L
+            </div>
           </div>`,
-          {
-            className: "dark-popup",
-            closeButton: false,
-          }
+          { className: "dark-popup", closeButton: false }
         );
 
-      // Aircraft markers
-      flyingAircraft.forEach((aircraft) => {
-        const pos = simulatedPositions[aircraft.id];
-        if (!pos) return;
+      // Runway lines
+      const rwy3L21R = [
+        [33.8696, -84.3078],
+        [33.8838, -84.2978],
+      ] as L.LatLngTuple[];
+      const rwy3R21L = [
+        [33.8718, -84.3068],
+        [33.8822, -84.2993],
+      ] as L.LatLngTuple[];
 
-        const aircraftIcon = L.divIcon({
-          className: "custom-marker",
-          html: `<div style="
-            position: relative;
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-          ">
-            <div style="
-              position: absolute; inset: 0;
-              background: rgba(34, 211, 238, 0.15);
-              border-radius: 50%;
-              animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-            "></div>
-            <div style="
-              width: 28px; height: 28px;
-              background: rgba(34, 211, 238, 0.2);
-              border: 2px solid rgba(34, 211, 238, 0.7);
-              border-radius: 50%;
-              display: flex; align-items: center; justify-content: center;
-              transform: rotate(${pos.heading}deg);
-              font-size: 14px;
-            ">✈</div>
-          </div>`,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20],
-        });
+      Leaflet.polyline(rwy3L21R, {
+        color: "#818cf8",
+        weight: 2,
+        opacity: 0.4,
+        dashArray: "6 4",
+      }).addTo(map);
+      Leaflet.polyline(rwy3R21L, {
+        color: "#818cf8",
+        weight: 2,
+        opacity: 0.4,
+        dashArray: "6 4",
+      }).addTo(map);
 
-        L.marker([pos.lat, pos.lng], { icon: aircraftIcon })
-          .addTo(map)
-          .bindPopup(
-            `<div style="font-family: sans-serif; color: #fff; background: #1a1a2e; padding: 12px; border-radius: 8px; min-width: 160px;">
-              <div style="font-weight: 600; margin-bottom: 2px;">${aircraft.tail_number}</div>
-              <div style="font-size: 11px; color: #9ca3af; margin-bottom: 8px;">${aircraft.make} ${aircraft.model}</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px;">
-                <div style="color: #6b7280;">Alt</div>
-                <div style="color: #22d3ee; text-align: right;">${pos.altitude.toLocaleString()} ft</div>
-                <div style="color: #6b7280;">Speed</div>
-                <div style="color: #22d3ee; text-align: right;">${pos.speed} kts</div>
-                <div style="color: #6b7280;">Heading</div>
-                <div style="color: #22d3ee; text-align: right;">${pos.heading}°</div>
-              </div>
-            </div>`,
-            {
-              className: "dark-popup",
-              closeButton: false,
-            }
-          );
-      });
+      const markerGroup = Leaflet.layerGroup().addTo(map);
+      markersRef.current = markerGroup;
+      leafletMap.current = map;
 
-      // Add custom CSS for popups
+      // Custom CSS
       const style = document.createElement("style");
       style.textContent = `
         .dark-popup .leaflet-popup-content-wrapper {
           background: transparent !important;
           box-shadow: none !important;
           padding: 0 !important;
-          border-radius: 8px !important;
+          border-radius: 10px !important;
         }
-        .dark-popup .leaflet-popup-content {
-          margin: 0 !important;
-        }
-        .dark-popup .leaflet-popup-tip {
-          background: #1a1a2e !important;
-        }
-        @keyframes ping {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-        .leaflet-container {
-          background: #0a0a0f !important;
+        .dark-popup .leaflet-popup-content { margin: 0 !important; }
+        .dark-popup .leaflet-popup-tip { background: #111827 !important; }
+        .leaflet-container { background: #070710 !important; }
+        @keyframes acPing {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(2.5); opacity: 0; }
         }
       `;
       document.head.appendChild(style);
-
-      leafletMap.current = map;
-      setMapLoaded(true);
     };
 
     loadMap();
-
     return () => {
       cancelled = true;
-      if (leafletMap.current) {
-        leafletMap.current.remove();
-        leafletMap.current = null;
-      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="relative w-full h-full">
-      <div ref={mapRef} className="w-full h-full" />
+  // Update aircraft markers when data changes
+  useEffect(() => {
+    const Leaflet = leafletRef.current;
+    const markers = markersRef.current;
+    if (!Leaflet || !markers) return;
 
-      {/* Legend overlay */}
-      <div className="absolute top-4 left-4 bg-surface-200/90 backdrop-blur-sm border border-surface-400 rounded-xl p-4 z-[1000]">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          Live Tracking
-        </h3>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-cyan-400" />
-            <span className="text-xs text-gray-300">
-              In Flight ({flyingAircraft.length})
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-brand-400" />
-            <span className="text-xs text-gray-300">Airport (KPDK)</span>
-          </div>
+    markers.clearLayers();
+
+    const visible = adsbAircraft.filter((ac) => {
+      if (ac.on_ground) return false;
+      if (filter === "fleet") return fleetIcaos.has(ac.icao24.toLowerCase());
+      if (filter === "traffic") return !fleetIcaos.has(ac.icao24.toLowerCase());
+      return true;
+    });
+
+    visible.forEach((ac) => {
+      const isFleet = fleetIcaos.has(ac.icao24.toLowerCase());
+      const isSelected = selectedIcao === ac.icao24;
+      const fleetAc = isFleet ? getFleetAircraft(ac.icao24) : null;
+
+      const color = isFleet ? "#22d3ee" : "#f59e0b";
+      const colorRgb = isFleet ? "34, 211, 238" : "245, 158, 11";
+      const size = isSelected ? 48 : 36;
+
+      const icon = Leaflet.divIcon({
+        className: "custom-marker",
+        html: `<div style="
+          position: relative; width: ${size}px; height: ${size}px;
+          display: flex; align-items: center; justify-content: center; cursor: pointer;
+        ">
+          ${isSelected ? `<div style="
+            position: absolute; inset: 0;
+            border: 2px solid ${color};
+            border-radius: 50%;
+            animation: acPing 1.5s ease-out infinite;
+          "></div>` : ""}
+          <div style="
+            position: absolute; inset: ${isSelected ? 4 : 2}px;
+            background: rgba(${colorRgb}, 0.12);
+            border-radius: 50%;
+          "></div>
+          <svg width="${size * 0.5}" height="${size * 0.5}" viewBox="0 0 24 24" fill="none" style="transform: rotate(${ac.heading}deg); filter: drop-shadow(0 0 4px ${color});">
+            <path d="M12 2L8 10H3L5 13H8L7 22H9L12 16L15 22H17L16 13H19L21 10H16L12 2Z" fill="${color}" stroke="${color}" stroke-width="0.5"/>
+          </svg>
+        </div>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+      });
+
+      const displayName = fleetAc
+        ? `${fleetAc.tail_number}`
+        : ac.callsign || ac.icao24.toUpperCase();
+      const subtitle = fleetAc
+        ? `${fleetAc.make} ${fleetAc.model}`
+        : "ADS-B Target";
+      const badge = isFleet
+        ? `<span style="display: inline-block; padding: 2px 6px; background: rgba(34,211,238,0.15); color: #22d3ee; border-radius: 4px; font-size: 10px; font-weight: 600; margin-left: 6px;">MY FLEET</span>`
+        : "";
+
+      const vRateArrow =
+        ac.vertical_rate > 200 ? " &#9650;" : ac.vertical_rate < -200 ? " &#9660;" : "";
+      const vRateColor =
+        ac.vertical_rate > 200
+          ? "#34d399"
+          : ac.vertical_rate < -200
+          ? "#f87171"
+          : "#9ca3af";
+
+      const popup = `<div style="font-family: system-ui, sans-serif; color: #fff; background: #111827; padding: 14px 16px; border-radius: 10px; min-width: 200px; border: 1px solid ${isFleet ? "rgba(34,211,238,0.3)" : "#1f2937"};">
+        <div style="display: flex; align-items: center; margin-bottom: 4px;">
+          <span style="font-weight: 700; font-size: 14px;">${displayName}</span>
+          ${badge}
         </div>
+        <div style="font-size: 11px; color: #6b7280; margin-bottom: 10px;">${subtitle}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px;">
+          <div style="color: #6b7280;">Altitude</div>
+          <div style="color: #e5e7eb; text-align: right; font-family: monospace;">${ac.altitude > 0 ? ac.altitude.toLocaleString() + " ft" : "GND"}</div>
+          <div style="color: #6b7280;">Speed</div>
+          <div style="color: #e5e7eb; text-align: right; font-family: monospace;">${ac.velocity} kts</div>
+          <div style="color: #6b7280;">Heading</div>
+          <div style="color: #e5e7eb; text-align: right; font-family: monospace;">${ac.heading}&deg;</div>
+          <div style="color: #6b7280;">V/S</div>
+          <div style="color: ${vRateColor}; text-align: right; font-family: monospace;">${ac.vertical_rate > 0 ? "+" : ""}${ac.vertical_rate} fpm${vRateArrow}</div>
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #1f2937; font-size: 10px; color: #4b5563;">
+          ICAO: ${ac.icao24.toUpperCase()} &bull; ${ac.callsign ? "CS: " + ac.callsign : "No callsign"}
+        </div>
+      </div>`;
 
-        {flyingAircraft.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-surface-400 space-y-2">
-            {flyingAircraft.map((ac) => {
-              const pos = simulatedPositions[ac.id];
-              return (
-                <div key={ac.id} className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-cyan-400">
-                    {ac.tail_number}
-                  </span>
-                  <span className="text-[10px] text-gray-500">
-                    {ac.make} {ac.model}
-                  </span>
-                  {pos && (
-                    <span className="text-[10px] text-gray-600 ml-auto">
-                      {pos.altitude.toLocaleString()}ft
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+      const marker = Leaflet.marker([ac.latitude, ac.longitude], { icon })
+        .bindPopup(popup, { className: "dark-popup", closeButton: false });
 
-        {flyingAircraft.length === 0 && (
-          <p className="mt-2 text-[10px] text-gray-600">
-            No aircraft currently in flight
-          </p>
-        )}
-      </div>
-    </div>
-  );
+      marker.on("click", () => {
+        onSelectAircraft(ac.icao24);
+      });
+
+      markers.addLayer(marker);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adsbAircraft, filter, selectedIcao]);
+
+  // Pan to selected aircraft
+  useEffect(() => {
+    if (!selectedIcao || !leafletMap.current) return;
+    const ac = adsbAircraft.find((a) => a.icao24 === selectedIcao);
+    if (ac) {
+      leafletMap.current.setView([ac.latitude, ac.longitude], 13, {
+        animate: true,
+        duration: 0.5,
+      });
+    }
+  }, [selectedIcao, adsbAircraft]);
+
+  return <div ref={mapRef} className="w-full h-full" />;
 }
