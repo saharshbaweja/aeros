@@ -22,6 +22,7 @@ export default function SignupPage() {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
+      document.cookie = "aeros_session=demo; path=/; max-age=86400";
       router.push("/");
       setIsLoading(false);
     }, 800);

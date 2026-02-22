@@ -18,6 +18,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
+      document.cookie = "aeros_session=demo; path=/; max-age=86400";
       router.push("/");
       setIsLoading(false);
     }, 800);
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const handleOAuthLogin = (provider: string) => {
     setIsLoading(true);
     setTimeout(() => {
+      document.cookie = "aeros_session=demo; path=/; max-age=86400";
       router.push("/");
       setIsLoading(false);
     }, 800);
