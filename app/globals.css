@@ -12,11 +12,10 @@
   }
 
   body {
-    @apply bg-black text-white antialiased;
+    @apply bg-surface-100 text-slate-800 antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -27,12 +26,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #333;
+    background: #CBD5E1;
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #444;
+    background: #94A3B8;
   }
 }
 

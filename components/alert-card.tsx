@@ -33,64 +33,63 @@ export default function AlertCard({ alert, onDismiss, onAction }: AlertCardProps
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 100, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="bg-surface-200 border border-surface-400 rounded-xl p-4 shadow-xl shadow-black/20 w-full"
+      className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm w-full"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div
             className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
               alert.priority === "critical" || alert.priority === "high"
-                ? "bg-rose-500/20"
+                ? "bg-rose-50"
                 : alert.alert_type === "weather"
-                ? "bg-amber-500/20"
-                : "bg-brand-500/20"
+                ? "bg-amber-50"
+                : "bg-brand-50"
             }`}
           >
             <Icon
               className={`w-4 h-4 ${
                 alert.priority === "critical" || alert.priority === "high"
-                  ? "text-rose-400"
+                  ? "text-rose-500"
                   : alert.alert_type === "weather"
-                  ? "text-amber-400"
-                  : "text-brand-400"
+                  ? "text-amber-500"
+                  : "text-brand-500"
               }`}
             />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 {alert.alert_type}
               </span>
               <Badge variant={priorityVariants[alert.priority]}>
                 {alert.priority}
               </Badge>
             </div>
-            <p className="text-small text-gray-200 leading-relaxed">
+            <p className="text-small text-slate-600 leading-relaxed">
               {alert.message}
             </p>
           </div>
         </div>
         <button
           onClick={() => onDismiss(alert.id)}
-          className="text-gray-600 hover:text-gray-400 transition-colors shrink-0"
+          className="text-slate-300 hover:text-slate-500 transition-colors shrink-0"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Actions */}
       <div className="flex items-center gap-2 mt-3 ml-11">
         <button
           onClick={() => onAction(alert.id, "handle")}
-          className="flex items-center gap-1 text-xs text-brand-400 hover:text-brand-300 transition-colors"
+          className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 transition-colors"
         >
           Handle this
           <ChevronRight className="w-3 h-3" />
         </button>
-        <span className="text-gray-700">|</span>
+        <span className="text-slate-200">|</span>
         <button
           onClick={() => onDismiss(alert.id)}
-          className="text-xs text-gray-500 hover:text-gray-400 transition-colors"
+          className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
         >
           Dismiss
         </button>

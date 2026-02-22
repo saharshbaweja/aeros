@@ -34,11 +34,11 @@ interface DispatchFlight extends Flight {
 }
 
 const dispatchSteps: { key: DispatchStatus; label: string; color: string }[] = [
-  { key: "pre-brief", label: "Pre-Brief", color: "text-amber-400" },
-  { key: "dispatched", label: "Dispatched", color: "text-brand-400" },
-  { key: "airborne", label: "Airborne", color: "text-cyan-400" },
-  { key: "landed", label: "Landed", color: "text-emerald-400" },
-  { key: "closed", label: "Closed", color: "text-gray-400" },
+  { key: "pre-brief", label: "Pre-Brief", color: "text-amber-500" },
+  { key: "dispatched", label: "Dispatched", color: "text-brand-500" },
+  { key: "airborne", label: "Airborne", color: "text-sky-500" },
+  { key: "landed", label: "Landed", color: "text-emerald-500" },
+  { key: "closed", label: "Closed", color: "text-slate-400" },
 ];
 
 export default function DispatchPage() {
@@ -142,11 +142,9 @@ export default function DispatchPage() {
   };
 
   const airborne = flights.filter((f) => f.dispatch_status === "airborne");
-  const selected = flights.find((f) => f.id === selectedFlight);
 
   return (
     <div className="h-screen flex overflow-hidden">
-      {/* Main dispatch board */}
       <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
           {/* Header */}
@@ -157,12 +155,12 @@ export default function DispatchPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
-                  <Radio className="w-5 h-5 text-brand-400" />
+                <div className="w-10 h-10 rounded-xl bg-brand-50 border border-brand-200 flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-brand-500" />
                 </div>
                 <div>
-                  <h1 className="text-heading text-white">Dispatch Board</h1>
-                  <p className="text-small text-gray-400">
+                  <h1 className="text-heading text-slate-800">Dispatch Board</h1>
+                  <p className="text-small text-slate-500">
                     {new Date().toLocaleDateString("en-US", {
                       weekday: "long",
                       month: "long",
@@ -173,10 +171,10 @@ export default function DispatchPage() {
                     <span
                       className={
                         mockWeather.flight_category === "VFR"
-                          ? "text-emerald-400"
+                          ? "text-emerald-500"
                           : mockWeather.flight_category === "MVFR"
-                          ? "text-amber-400"
-                          : "text-rose-400"
+                          ? "text-amber-500"
+                          : "text-rose-500"
                       }
                     >
                       {mockWeather.flight_category}
@@ -188,11 +186,11 @@ export default function DispatchPage() {
 
             {/* Quick status bar */}
             <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-200 border border-surface-400 rounded-lg">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-amber-400" />
-                <span className="text-gray-400">
+                <span className="text-slate-500">
                   Pre-brief:{" "}
-                  <span className="text-white font-semibold">
+                  <span className="text-slate-800 font-semibold">
                     {
                       grouped.active.filter(
                         (f) => f.dispatch_status === "pre-brief"
@@ -201,11 +199,11 @@ export default function DispatchPage() {
                   </span>
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-200 border border-surface-400 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-brand-400" />
-                <span className="text-gray-400">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-brand-500" />
+                <span className="text-slate-500">
                   Dispatched:{" "}
-                  <span className="text-white font-semibold">
+                  <span className="text-slate-800 font-semibold">
                     {
                       grouped.active.filter(
                         (f) => f.dispatch_status === "dispatched"
@@ -214,20 +212,20 @@ export default function DispatchPage() {
                   </span>
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-200 border border-surface-400 rounded-lg">
-                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-gray-400">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                <span className="text-slate-500">
                   Airborne:{" "}
-                  <span className="text-cyan-400 font-semibold">
+                  <span className="text-sky-500 font-semibold">
                     {airborne.length}
                   </span>
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-200 border border-surface-400 rounded-lg">
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span className="text-gray-400">
+                <span className="text-slate-500">
                   Closed:{" "}
-                  <span className="text-white font-semibold">
+                  <span className="text-slate-800 font-semibold">
                     {grouped.closed.length}
                   </span>
                 </span>
@@ -237,15 +235,12 @@ export default function DispatchPage() {
 
           {/* Active flights */}
           <div className="space-y-2 mb-8">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
               Active Operations ({grouped.active.length})
             </h2>
             {grouped.active
               .sort((a, b) => a.flight_time.localeCompare(b.flight_time))
               .map((flight, i) => {
-                const step = dispatchSteps.find(
-                  (s) => s.key === flight.dispatch_status
-                )!;
                 const isSelected = selectedFlight === flight.id;
 
                 return (
@@ -257,19 +252,19 @@ export default function DispatchPage() {
                     onClick={() =>
                       setSelectedFlight(isSelected ? null : flight.id)
                     }
-                    className={`bg-surface-200 border rounded-xl p-4 cursor-pointer transition-all ${
+                    className={`bg-white border rounded-xl p-4 cursor-pointer transition-all shadow-sm ${
                       isSelected
-                        ? "border-brand-500/50 ring-1 ring-brand-500/20"
-                        : "border-surface-400 hover:border-surface-500"
+                        ? "border-brand-300 ring-1 ring-brand-200"
+                        : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       {/* Time */}
                       <div className="w-16 flex-shrink-0">
-                        <span className="font-mono text-sm font-semibold text-white">
+                        <span className="font-mono text-sm font-semibold text-slate-800">
                           {formatTime(flight.flight_time)}
                         </span>
-                        <p className="font-mono text-[10px] text-gray-600">
+                        <p className="font-mono text-[10px] text-slate-400">
                           {flight.duration_minutes}min
                         </p>
                       </div>
@@ -278,12 +273,12 @@ export default function DispatchPage() {
                       <div
                         className={`w-20 flex-shrink-0 text-center py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider ${
                           flight.dispatch_status === "pre-brief"
-                            ? "bg-amber-500/15 text-amber-400"
+                            ? "bg-amber-50 text-amber-600 border border-amber-200"
                             : flight.dispatch_status === "dispatched"
-                            ? "bg-brand-500/15 text-brand-400"
+                            ? "bg-brand-50 text-brand-600 border border-brand-200"
                             : flight.dispatch_status === "airborne"
-                            ? "bg-cyan-500/15 text-cyan-400"
-                            : "bg-emerald-500/15 text-emerald-400"
+                            ? "bg-sky-50 text-sky-600 border border-sky-200"
+                            : "bg-emerald-50 text-emerald-600 border border-emerald-200"
                         }`}
                       >
                         {flight.dispatch_status}
@@ -292,24 +287,24 @@ export default function DispatchPage() {
                       {/* Flight info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-white font-medium truncate">
+                          <span className="text-sm text-slate-800 font-medium truncate">
                             {flight.customer_name}
                           </span>
-                          <span className="text-[10px] px-1.5 py-0.5 bg-surface-300 text-gray-500 rounded">
+                          <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded border border-slate-200">
                             {getServiceTypeLabel(flight.service_type)}
                           </span>
                         </div>
                         <div className="flex items-center gap-3 mt-0.5">
-                          <span className="font-mono text-xs text-gray-500">
+                          <span className="font-mono text-xs text-slate-500">
                             {flight.aircraft?.tail_number}
                           </span>
                           {flight.instructor && (
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-slate-400">
                               CFI: {flight.instructor}
                             </span>
                           )}
                           {flight.fuel_required && (
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-slate-400">
                               Fuel: {flight.fuel_required}
                             </span>
                           )}
@@ -323,7 +318,7 @@ export default function DispatchPage() {
                             e.stopPropagation();
                             revertStatus(flight.id);
                           }}
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-600 hover:text-gray-300 hover:bg-surface-300 transition-all"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
                           title="Revert status"
                         >
                           <ArrowRightLeft className="w-3 h-3" />
@@ -335,12 +330,12 @@ export default function DispatchPage() {
                           }}
                           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                             flight.dispatch_status === "pre-brief"
-                              ? "bg-brand-500 text-white hover:bg-brand-600"
+                              ? "bg-brand-500 text-white hover:bg-brand-600 shadow-sm"
                               : flight.dispatch_status === "dispatched"
-                              ? "bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
+                              ? "bg-sky-50 text-sky-600 border border-sky-200 hover:bg-sky-100"
                               : flight.dispatch_status === "airborne"
-                              ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                              : "bg-surface-300 text-gray-400"
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100"
+                              : "bg-slate-100 text-slate-400"
                           }`}
                         >
                           {flight.dispatch_status === "pre-brief"
@@ -363,52 +358,52 @@ export default function DispatchPage() {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <div className="mt-3 pt-3 border-t border-surface-400/50">
+                          <div className="mt-3 pt-3 border-t border-slate-200">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
                               <div>
-                                <p className="text-[10px] text-gray-600 uppercase tracking-wider">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                                   Customer
                                 </p>
-                                <p className="text-xs text-white">
+                                <p className="text-xs text-slate-800">
                                   {flight.customer_name}
                                 </p>
                                 {flight.customer_email && (
-                                  <p className="text-[10px] text-gray-500">
+                                  <p className="text-[10px] text-slate-500">
                                     {flight.customer_email}
                                   </p>
                                 )}
                               </div>
                               <div>
-                                <p className="text-[10px] text-gray-600 uppercase tracking-wider">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                                   Aircraft
                                 </p>
-                                <p className="text-xs text-white font-mono">
+                                <p className="text-xs text-slate-800 font-mono">
                                   {flight.aircraft?.tail_number}
                                 </p>
-                                <p className="text-[10px] text-gray-500">
+                                <p className="text-[10px] text-slate-500">
                                   {flight.aircraft?.make}{" "}
                                   {flight.aircraft?.model}
                                 </p>
                               </div>
                               <div>
-                                <p className="text-[10px] text-gray-600 uppercase tracking-wider">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                                   Service
                                 </p>
-                                <p className="text-xs text-white">
+                                <p className="text-xs text-slate-800">
                                   {getServiceTypeLabel(flight.service_type)}
                                 </p>
-                                <p className="text-[10px] text-gray-500">
+                                <p className="text-[10px] text-slate-500">
                                   {flight.duration_minutes} minutes
                                 </p>
                               </div>
                               <div>
-                                <p className="text-[10px] text-gray-600 uppercase tracking-wider">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                                   Weather
                                 </p>
-                                <p className="text-xs text-white">
+                                <p className="text-xs text-slate-800">
                                   {mockWeather.flight_category}
                                 </p>
-                                <p className="text-[10px] text-gray-500">
+                                <p className="text-[10px] text-slate-500">
                                   Wind {mockWeather.wind_direction}@
                                   {mockWeather.wind_speed}
                                   {mockWeather.wind_gust
@@ -420,11 +415,11 @@ export default function DispatchPage() {
 
                             {/* Dispatch notes */}
                             {flight.dispatch_notes && (
-                              <div className="mb-3 p-2.5 bg-surface-300/50 rounded-lg">
-                                <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">
+                              <div className="mb-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">
                                   Notes
                                 </p>
-                                <pre className="text-xs text-gray-300 font-sans whitespace-pre-wrap">
+                                <pre className="text-xs text-slate-600 font-sans whitespace-pre-wrap">
                                   {flight.dispatch_notes}
                                 </pre>
                               </div>
@@ -441,7 +436,7 @@ export default function DispatchPage() {
                                     if (e.key === "Enter") addNote(flight.id);
                                   }}
                                   placeholder="Add dispatch note..."
-                                  className="flex-1 bg-surface-300 border border-surface-400 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/50 placeholder:text-gray-600"
+                                  className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400 placeholder:text-slate-400"
                                   onClick={(e) => e.stopPropagation()}
                                 />
                                 <button
@@ -449,7 +444,7 @@ export default function DispatchPage() {
                                     e.stopPropagation();
                                     addNote(flight.id);
                                   }}
-                                  className="w-7 h-7 rounded-lg bg-brand-500/20 flex items-center justify-center text-brand-400 hover:bg-brand-500/30 transition-all"
+                                  className="w-7 h-7 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-500 hover:bg-brand-100 transition-all"
                                 >
                                   <Send className="w-3 h-3" />
                                 </button>
@@ -459,7 +454,7 @@ export default function DispatchPage() {
                                   e.stopPropagation();
                                   cancelFlight(flight.id);
                                 }}
-                                className="px-3 py-1.5 rounded-lg text-xs text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 transition-all"
+                                className="px-3 py-1.5 rounded-lg text-xs text-rose-500 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-all"
                               >
                                 Cancel Flight
                               </button>
@@ -474,8 +469,8 @@ export default function DispatchPage() {
 
             {grouped.active.length === 0 && (
               <div className="text-center py-8">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400/50 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">
+                <CheckCircle2 className="w-8 h-8 text-emerald-300 mx-auto mb-2" />
+                <p className="text-sm text-slate-500">
                   All flights closed for today
                 </p>
               </div>
@@ -485,31 +480,31 @@ export default function DispatchPage() {
           {/* Closed flights */}
           {grouped.closed.length > 0 && (
             <div>
-              <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">
+              <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
                 Closed ({grouped.closed.length})
               </h2>
               <div className="space-y-1.5">
                 {grouped.closed.map((flight) => (
                   <div
                     key={flight.id}
-                    className="flex items-center gap-4 px-4 py-2.5 bg-surface-200/50 border border-surface-400/50 rounded-lg opacity-60"
+                    className="flex items-center gap-4 px-4 py-2.5 bg-white/60 border border-slate-200 rounded-lg opacity-60"
                   >
-                    <span className="font-mono text-xs text-gray-500 w-14">
+                    <span className="font-mono text-xs text-slate-400 w-14">
                       {formatTime(flight.flight_time)}
                     </span>
                     {flight.status === "cancelled" ? (
-                      <span className="text-[10px] px-1.5 py-0.5 bg-rose-500/10 text-rose-400 rounded font-medium">
+                      <span className="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-500 border border-rose-200 rounded font-medium">
                         CANCELLED
                       </span>
                     ) : (
-                      <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded font-medium">
+                      <span className="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-500 border border-emerald-200 rounded font-medium">
                         CLOSED
                       </span>
                     )}
-                    <span className="text-xs text-gray-500 flex-1">
+                    <span className="text-xs text-slate-500 flex-1">
                       {flight.customer_name}
                     </span>
-                    <span className="font-mono text-[10px] text-gray-600">
+                    <span className="font-mono text-[10px] text-slate-400">
                       {flight.aircraft?.tail_number}
                     </span>
                   </div>

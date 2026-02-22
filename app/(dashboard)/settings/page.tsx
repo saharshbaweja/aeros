@@ -15,10 +15,10 @@ export default function SettingsPage() {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-surface-300 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-gray-400" />
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center">
+              <Settings className="w-5 h-5 text-slate-500" />
             </div>
-            <h1 className="text-heading text-white">Settings</h1>
+            <h1 className="text-heading text-slate-800">Settings</h1>
           </div>
         </motion.div>
 
@@ -28,27 +28,27 @@ export default function SettingsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-surface-200 border border-surface-400 rounded-xl p-5"
+            className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-4 h-4 text-brand-400" />
-              <h2 className="text-subheading text-white">FBO Information</h2>
+              <Building2 className="w-4 h-4 text-brand-500" />
+              <h2 className="text-subheading text-slate-800">FBO Information</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   FBO Name
                 </label>
                 <Input defaultValue="SkyHaven FBO" />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   Airport Code
                 </label>
                 <Input defaultValue="KPDK" />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   Phone
                 </label>
                 <Input defaultValue="(770) 555-0123" />
@@ -61,21 +61,21 @@ export default function SettingsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-surface-200 border border-surface-400 rounded-xl p-5"
+            className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
           >
             <div className="flex items-center gap-2 mb-4">
-              <User className="w-4 h-4 text-brand-400" />
-              <h2 className="text-subheading text-white">Profile</h2>
+              <User className="w-4 h-4 text-brand-500" />
+              <h2 className="text-subheading text-slate-800">Profile</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   Full Name
                 </label>
                 <Input defaultValue="Sarah Johnson" />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   Email
                 </label>
                 <Input defaultValue="sarah@skyhaven.com" />
@@ -88,21 +88,27 @@ export default function SettingsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-surface-200 border border-surface-400 rounded-xl p-5"
+            className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Key className="w-4 h-4 text-brand-400" />
-              <h2 className="text-subheading text-white">Integrations</h2>
+              <Key className="w-4 h-4 text-brand-500" />
+              <h2 className="text-subheading text-slate-800">Integrations</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
                   OpenAI API Key
                 </label>
                 <Input type="password" placeholder="sk-..." />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-slate-500 mb-1 block">
+                  Flight Tracker Pro API Key
+                </label>
+                <Input type="password" placeholder="ftp_..." />
+              </div>
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">
                   Twilio Phone Number
                 </label>
                 <Input placeholder="+1 (555) 000-0000" />
@@ -115,11 +121,11 @@ export default function SettingsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="bg-surface-200 border border-surface-400 rounded-xl p-5"
+            className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
           >
             <div className="flex items-center gap-2 mb-4">
-              <Bell className="w-4 h-4 text-brand-400" />
-              <h2 className="text-subheading text-white">Notifications</h2>
+              <Bell className="w-4 h-4 text-brand-500" />
+              <h2 className="text-subheading text-slate-800">Notifications</h2>
             </div>
             <div className="space-y-3">
               {[
@@ -132,9 +138,9 @@ export default function SettingsPage() {
                   key={item}
                   className="flex items-center justify-between py-2"
                 >
-                  <span className="text-small text-gray-300">{item}</span>
+                  <span className="text-small text-slate-600">{item}</span>
                   <div className="w-10 h-6 bg-brand-500 rounded-full relative cursor-pointer">
-                    <div className="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform" />
+                    <div className="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm" />
                   </div>
                 </label>
               ))}

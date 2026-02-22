@@ -43,29 +43,33 @@ interface Customer {
 
 const stageConfig: Record<
   CustomerStage,
-  { label: string; color: string; bg: string }
+  { label: string; color: string; bg: string; border: string }
 > = {
-  lead: { label: "Lead", color: "text-gray-400", bg: "bg-gray-500/15" },
+  lead: { label: "Lead", color: "text-slate-500", bg: "bg-slate-50", border: "border-slate-200" },
   discovery: {
     label: "Discovery",
-    color: "text-amber-400",
-    bg: "bg-amber-500/15",
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
   },
   student: {
     label: "Student",
-    color: "text-brand-400",
-    bg: "bg-brand-500/15",
+    color: "text-brand-600",
+    bg: "bg-brand-50",
+    border: "border-brand-200",
   },
   private_pilot: {
     label: "Private Pilot",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/15",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
   },
-  renter: { label: "Renter", color: "text-cyan-400", bg: "bg-cyan-500/15" },
+  renter: { label: "Renter", color: "text-sky-600", bg: "bg-sky-50", border: "border-sky-200" },
   inactive: {
     label: "Inactive",
-    color: "text-gray-500",
-    bg: "bg-gray-500/10",
+    color: "text-slate-400",
+    bg: "bg-slate-50",
+    border: "border-slate-200",
   },
 };
 
@@ -200,7 +204,6 @@ export default function CustomersPage() {
   });
 
   const totalRevenue = customers.reduce((sum, c) => sum + c.total_revenue, 0);
-  const totalFlights = customers.reduce((sum, c) => sum + c.total_flights, 0);
 
   const handleAdd = () => {
     if (!addForm.name) return;
@@ -236,12 +239,12 @@ export default function CustomersPage() {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <Users className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                <Users className="w-5 h-5 text-emerald-500" />
               </div>
               <div>
-                <h1 className="text-heading text-white">Customers</h1>
-                <p className="text-small text-gray-400">
+                <h1 className="text-heading text-slate-800">Customers</h1>
+                <p className="text-small text-slate-500">
                   {customers.length} total &bull; ${totalRevenue.toLocaleString()} lifetime revenue
                 </p>
               </div>
@@ -272,8 +275,8 @@ export default function CustomersPage() {
                   }
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${
                     stageFilter === stage
-                      ? `${cfg.bg} border-current ${cfg.color}`
-                      : "bg-surface-200 border-surface-400 text-gray-500 hover:text-gray-300"
+                      ? `${cfg.bg} ${cfg.border} ${cfg.color}`
+                      : "bg-white border-slate-200 text-slate-500 hover:text-slate-700"
                   }`}
                 >
                   <span className="text-xs font-medium">{cfg.label}</span>
@@ -281,7 +284,7 @@ export default function CustomersPage() {
                     className={`text-[10px] px-1.5 py-0.5 rounded ${
                       stageFilter === stage
                         ? `${cfg.bg} ${cfg.color}`
-                        : "bg-surface-300 text-gray-600"
+                        : "bg-slate-100 text-slate-400"
                     }`}
                   >
                     {count}
@@ -301,13 +304,13 @@ export default function CustomersPage() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden mb-6"
             >
-              <div className="bg-surface-200 border border-surface-400 rounded-xl p-5">
-                <h3 className="text-sm font-semibold text-white mb-4">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-800 mb-4">
                   Add New Customer
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs text-gray-500">Name *</label>
+                    <label className="text-xs text-slate-500">Name *</label>
                     <Input
                       placeholder="Full name"
                       value={addForm.name}
@@ -317,7 +320,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-gray-500">Email</label>
+                    <label className="text-xs text-slate-500">Email</label>
                     <Input
                       type="email"
                       placeholder="email@example.com"
@@ -328,7 +331,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-gray-500">Phone</label>
+                    <label className="text-xs text-slate-500">Phone</label>
                     <Input
                       placeholder="+1 (555) 000-0000"
                       value={addForm.phone}
@@ -338,7 +341,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-gray-500">Stage</label>
+                    <label className="text-xs text-slate-500">Stage</label>
                     <select
                       value={addForm.stage}
                       onChange={(e) =>
@@ -347,7 +350,7 @@ export default function CustomersPage() {
                           stage: e.target.value as CustomerStage,
                         })
                       }
-                      className="w-full bg-surface-300 border border-surface-400 rounded-xl px-3 py-2.5 text-sm text-white outline-none"
+                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400"
                     >
                       {stages.map((s) => (
                         <option key={s} value={s}>
@@ -357,7 +360,7 @@ export default function CustomersPage() {
                     </select>
                   </div>
                   <div className="col-span-2 space-y-1">
-                    <label className="text-xs text-gray-500">Notes</label>
+                    <label className="text-xs text-slate-500">Notes</label>
                     <Input
                       placeholder="How did they find you? Any preferences?"
                       value={addForm.notes}
@@ -386,13 +389,13 @@ export default function CustomersPage() {
 
         {/* Search */}
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search customers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface-200 border border-surface-400 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:ring-1 focus:ring-brand-500/50 placeholder:text-gray-600"
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400 placeholder:text-slate-400 shadow-sm"
           />
         </div>
 
@@ -411,16 +414,16 @@ export default function CustomersPage() {
                 onClick={() =>
                   setSelectedId(isSelected ? null : customer.id)
                 }
-                className={`bg-surface-200 border rounded-xl p-4 cursor-pointer transition-all ${
+                className={`bg-white border rounded-xl p-4 cursor-pointer transition-all shadow-sm ${
                   isSelected
-                    ? "border-brand-500/50 ring-1 ring-brand-500/20"
-                    : "border-surface-400 hover:border-surface-500"
+                    ? "border-brand-300 ring-1 ring-brand-200"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full bg-surface-300 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-gray-400">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-slate-500">
                       {customer.name
                         .split(" ")
                         .map((n) => n[0])
@@ -431,16 +434,16 @@ export default function CustomersPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white truncate">
+                      <span className="text-sm font-medium text-slate-800 truncate">
                         {customer.name}
                       </span>
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${cfg.bg} ${cfg.color}`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium border ${cfg.bg} ${cfg.color} ${cfg.border}`}
                       >
                         {cfg.label}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-0.5 text-[11px] text-gray-500">
+                    <div className="flex items-center gap-3 mt-0.5 text-[11px] text-slate-500">
                       <span>{customer.email}</span>
                       <span>&bull;</span>
                       <span>Last flight: {customer.last_flight}</span>
@@ -450,16 +453,16 @@ export default function CustomersPage() {
                   {/* Stats */}
                   <div className="hidden md:flex items-center gap-6 flex-shrink-0">
                     <div className="text-right">
-                      <p className="font-mono text-xs text-white">
+                      <p className="font-mono text-xs text-slate-700">
                         {customer.total_flights}
                       </p>
-                      <p className="text-[10px] text-gray-600">flights</p>
+                      <p className="text-[10px] text-slate-400">flights</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono text-xs text-emerald-400">
+                      <p className="font-mono text-xs text-emerald-600">
                         ${customer.total_revenue.toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-gray-600">revenue</p>
+                      <p className="text-[10px] text-slate-400">revenue</p>
                     </div>
                   </div>
                 </div>
@@ -473,13 +476,13 @@ export default function CustomersPage() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="mt-3 pt-3 border-t border-surface-400/50">
+                      <div className="mt-3 pt-3 border-t border-slate-200">
                         {/* Contact */}
                         <div className="flex items-center gap-4 mb-3">
                           <a
                             href={`mailto:${customer.email}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-300 rounded-lg text-xs text-gray-400 hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-700 transition-all"
                           >
                             <Mail className="w-3 h-3" />
                             Email
@@ -487,7 +490,7 @@ export default function CustomersPage() {
                           <a
                             href={`tel:${customer.phone}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-300 rounded-lg text-xs text-gray-400 hover:text-white transition-all"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-700 transition-all"
                           >
                             <Phone className="w-3 h-3" />
                             Call
@@ -496,16 +499,16 @@ export default function CustomersPage() {
 
                         {/* Notes */}
                         {customer.notes && (
-                          <div className="p-2.5 bg-surface-300/50 rounded-lg mb-3">
-                            <p className="text-xs text-gray-300">
+                          <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg mb-3">
+                            <p className="text-xs text-slate-600">
                               {customer.notes}
                             </p>
                           </div>
                         )}
 
                         {/* Stage update */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-gray-600 mr-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] text-slate-400 mr-1">
                             Move to:
                           </span>
                           {stages
@@ -517,7 +520,7 @@ export default function CustomersPage() {
                                   e.stopPropagation();
                                   updateStage(customer.id, s);
                                 }}
-                                className={`text-[10px] px-2 py-1 rounded ${stageConfig[s].bg} ${stageConfig[s].color} hover:opacity-80 transition-all`}
+                                className={`text-[10px] px-2 py-1 rounded border ${stageConfig[s].bg} ${stageConfig[s].color} ${stageConfig[s].border} hover:opacity-80 transition-all`}
                               >
                                 {stageConfig[s].label}
                               </button>
@@ -534,8 +537,8 @@ export default function CustomersPage() {
 
         {filtered.length === 0 && (
           <div className="text-center py-12">
-            <Users className="w-8 h-8 text-gray-700 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">No customers found</p>
+            <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+            <p className="text-sm text-slate-500">No customers found</p>
           </div>
         )}
       </div>

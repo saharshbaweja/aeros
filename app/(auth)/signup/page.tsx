@@ -28,7 +28,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,24 +40,24 @@ export default function SignupPage() {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-500/20 border border-brand-500/30 mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 mb-4"
           >
-            <Plane className="w-8 h-8 text-brand-400" />
+            <Plane className="w-8 h-8 text-brand-500" />
           </motion.div>
-          <h1 className="text-display text-white mb-2">Get Started</h1>
-          <p className="text-body text-gray-400">
+          <h1 className="text-display text-slate-800 mb-2">Get Started</h1>
+          <p className="text-body text-slate-500">
             Set up your FBO in under 2 minutes
           </p>
         </div>
 
-        <div className="bg-surface-200 border border-surface-400 rounded-2xl p-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-small text-gray-400 font-medium">
+              <label className="text-small text-slate-600 font-medium">
                 FBO Name
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   placeholder="SkyHaven FBO"
                   value={formData.fboName}
@@ -70,11 +70,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-gray-400 font-medium">
+              <label className="text-small text-slate-600 font-medium">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   placeholder="Sarah Johnson"
                   value={formData.fullName}
@@ -87,11 +87,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-gray-400 font-medium">
+              <label className="text-small text-slate-600 font-medium">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   type="email"
                   placeholder="sarah@skyhaven.com"
@@ -105,11 +105,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-gray-400 font-medium">
+              <label className="text-small text-slate-600 font-medium">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   type="password"
                   placeholder="At least 8 characters"
@@ -139,11 +139,11 @@ export default function SignupPage() {
           </form>
         </div>
 
-        <p className="text-center text-small text-gray-500 mt-6">
+        <p className="text-center text-small text-slate-500 mt-6">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-brand-400 hover:text-brand-300 transition-colors"
+            className="text-brand-500 hover:text-brand-600 transition-colors font-medium"
           >
             Sign in
           </Link>
