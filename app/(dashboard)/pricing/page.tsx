@@ -109,8 +109,8 @@ export default function PricingPage() {
               transition={{ delay: 0.1 * i }}
               className={`relative rounded-2xl p-6 ${
                 plan.highlight
-                  ? "bg-brand-500/10 border-2 border-brand-500/40"
-                  : "bg-surface-200 border border-surface-400"
+                  ? "bg-white/[0.08] border-2 border-brand-500/30 shadow-lg shadow-brand-500/10"
+                  : "bg-white/[0.04] backdrop-blur-xl border border-white/[0.06]"
               }`}
             >
               {plan.highlight && (
@@ -179,7 +179,7 @@ export default function PricingPage() {
             {addOns.map((addon, i) => (
               <div
                 key={addon.name}
-                className="bg-surface-200 border border-surface-400 rounded-xl p-5"
+                className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-xl p-5"
               >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm font-semibold text-white">
@@ -200,7 +200,7 @@ export default function PricingPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-surface-200 border border-surface-400 rounded-2xl p-8 text-center"
+          className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-8 text-center"
         >
           <div className="flex items-center justify-center gap-8 mb-6">
             <div className="flex items-center gap-2 text-small text-gray-400">

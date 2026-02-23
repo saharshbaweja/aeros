@@ -11,6 +11,8 @@ import {
   DollarSign,
   ArrowUpRight,
   ChevronRight,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 import {
   mockFlights,
@@ -68,19 +70,19 @@ function DashboardContent() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
-        <div className="max-w-xl mx-auto px-4 sm:px-6 py-6">
+        <div className="max-w-2xl mx-auto px-6 py-8">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-8"
           >
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-heading text-slate-800">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-display text-zinc-100" style={{ letterSpacing: "-0.03em" }}>
                 {getGreeting()}
               </h1>
             </div>
-            <p className="text-small text-slate-500">
+            <p className="text-small text-zinc-500">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "long",
@@ -96,57 +98,65 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="grid grid-cols-2 gap-3 mb-6"
+            className="grid grid-cols-2 gap-3 mb-8"
           >
             <Link
               href="/dispatch"
-              className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand-300 hover:shadow-md transition-all group"
+              className="glass rounded-2xl p-5 glass-hover transition-all duration-200 group"
             >
-              <div className="flex items-center justify-between mb-2">
-                <Calendar className="w-4 h-4 text-brand-500" />
-                <ArrowUpRight className="w-3 h-3 text-slate-300 group-hover:text-brand-400 transition-colors" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-brand-500/20 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-brand-400" />
+                </div>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-brand-400 transition-colors" />
               </div>
-              <p className="text-2xl font-semibold text-slate-800 font-mono">
+              <p className="text-2xl font-bold text-zinc-100 font-mono tracking-tight">
                 {scheduledFlights.length}
               </p>
-              <p className="text-[11px] text-slate-500">Flights today</p>
+              <p className="text-xs text-zinc-500 mt-1">Flights today</p>
             </Link>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <DollarSign className="w-4 h-4 text-emerald-500" />
-                <TrendingUp className="w-3 h-3 text-emerald-400" />
+            <div className="glass rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-emerald-400" />
+                </div>
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
               </div>
-              <p className="text-2xl font-semibold text-slate-800 font-mono">
+              <p className="text-2xl font-bold text-zinc-100 font-mono tracking-tight">
                 ${todayRevenue.toLocaleString()}
               </p>
-              <p className="text-[11px] text-slate-500">Today&apos;s revenue</p>
+              <p className="text-xs text-zinc-500 mt-1">Today&apos;s revenue</p>
             </div>
 
             <Link
               href="/aircraft"
-              className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand-300 hover:shadow-md transition-all group"
+              className="glass rounded-2xl p-5 glass-hover transition-all duration-200 group"
             >
-              <div className="flex items-center justify-between mb-2">
-                <PlaneTakeoff className="w-4 h-4 text-sky-500" />
-                <ArrowUpRight className="w-3 h-3 text-slate-300 group-hover:text-brand-400 transition-colors" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center">
+                  <PlaneTakeoff className="w-4 h-4 text-sky-400" />
+                </div>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-sky-400 transition-colors" />
               </div>
-              <p className="text-2xl font-semibold text-slate-800 font-mono">
+              <p className="text-2xl font-bold text-zinc-100 font-mono tracking-tight">
                 {utilizationRate}%
               </p>
-              <p className="text-[11px] text-slate-500">Fleet utilization</p>
+              <p className="text-xs text-zinc-500 mt-1">Fleet utilization</p>
             </Link>
 
             <Link
               href="/customers"
-              className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand-300 hover:shadow-md transition-all group"
+              className="glass rounded-2xl p-5 glass-hover transition-all duration-200 group"
             >
-              <div className="flex items-center justify-between mb-2">
-                <Users className="w-4 h-4 text-amber-500" />
-                <ArrowUpRight className="w-3 h-3 text-slate-300 group-hover:text-brand-400 transition-colors" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-amber-400" />
+                </div>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-amber-400 transition-colors" />
               </div>
-              <p className="text-2xl font-semibold text-slate-800 font-mono">8</p>
-              <p className="text-[11px] text-slate-500">Active customers</p>
+              <p className="text-2xl font-bold text-zinc-100 font-mono tracking-tight">8</p>
+              <p className="text-xs text-zinc-500 mt-1">Active customers</p>
             </Link>
           </motion.div>
 
@@ -156,9 +166,9 @@ function DashboardContent() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="space-y-2 mb-6"
+                className="space-y-2 mb-8"
               >
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
                   Alerts requiring action
                 </h2>
                 {alerts.map((alert) => (
@@ -178,47 +188,47 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white border border-slate-200 rounded-xl p-5 mb-4"
+            className="glass rounded-2xl p-5 mb-4"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-slate-800">Next Up</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">Next Up</h3>
               <Link
                 href="/dispatch"
-                className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-brand-400 hover:text-brand-300 transition-colors"
               >
                 Dispatch board
                 <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {nextFlights.map((flight) => (
                 <div
                   key={flight.id}
-                  className="flex items-center gap-3 p-2.5 bg-slate-50 rounded-lg"
+                  className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl border border-white/[0.04] hover:bg-white/[0.06] transition-all"
                 >
                   <div className="w-14 text-center">
-                    <span className="font-mono text-xs font-semibold text-brand-500">
+                    <span className="font-mono text-xs font-semibold text-brand-400">
                       {formatTime(flight.flight_time)}
                     </span>
                   </div>
-                  <div className="w-px h-8 bg-slate-200" />
+                  <div className="w-px h-8 bg-white/[0.06]" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-700 truncate">
+                      <span className="text-sm text-zinc-200 truncate">
                         {flight.customer_name}
                       </span>
-                      <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded border border-slate-200">
+                      <span className="text-[10px] px-1.5 py-0.5 bg-white/[0.06] text-zinc-400 rounded border border-white/[0.06]">
                         {getServiceTypeLabel(flight.service_type)}
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-400">
+                    <span className="font-mono text-[10px] text-zinc-500">
                       {flight.aircraft?.tail_number} &bull;{" "}
                       {flight.duration_minutes}min
                     </span>
                   </div>
                   <Link
                     href="/dispatch"
-                    className="px-2.5 py-1 bg-brand-50 text-brand-500 rounded-lg text-[10px] font-medium hover:bg-brand-100 transition-all border border-brand-200"
+                    className="px-2.5 py-1 bg-brand-500/20 text-brand-400 rounded-lg text-[10px] font-medium hover:bg-brand-500/30 transition-all border border-brand-500/20"
                   >
                     Dispatch
                   </Link>
@@ -232,13 +242,13 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white border border-slate-200 rounded-xl p-5 mb-4"
+            className="glass rounded-2xl p-5 mb-4"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-slate-800">Fleet</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">Fleet</h3>
               <Link
                 href="/aircraft"
-                className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 transition-colors"
+                className="flex items-center gap-1 text-xs text-brand-400 hover:text-brand-300 transition-colors"
               >
                 Manage fleet
                 <ChevronRight className="w-3 h-3" />
@@ -248,7 +258,7 @@ function DashboardContent() {
               {mockAircraft.map((ac) => (
                 <div
                   key={ac.id}
-                  className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100"
+                  className="flex items-center gap-2 p-3 bg-white/[0.03] rounded-xl border border-white/[0.04]"
                 >
                   <div
                     className={`w-2 h-2 rounded-full ${
@@ -260,10 +270,10 @@ function DashboardContent() {
                     }`}
                   />
                   <div>
-                    <p className="font-mono text-xs text-slate-700">
+                    <p className="font-mono text-xs text-zinc-200">
                       {ac.tail_number}
                     </p>
-                    <p className="text-[10px] text-slate-400 capitalize">
+                    <p className="text-[10px] text-zinc-500 capitalize">
                       {ac.status}
                     </p>
                   </div>
@@ -286,28 +296,28 @@ function DashboardContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white border border-slate-200 rounded-xl p-5 mt-4"
+            className="glass rounded-2xl p-5 mt-4"
           >
-            <h3 className="text-sm font-semibold text-slate-800 mb-3">
+            <h3 className="text-sm font-semibold text-zinc-200 mb-3">
               Quick Actions
             </h3>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {[
-                { label: "Open dispatch board", href: "/dispatch", icon: Radio, color: "text-brand-500" },
-                { label: "Track flights on map", href: "/map", icon: PlaneTakeoff, color: "text-sky-500" },
-                { label: "Manage fleet", href: "/aircraft", icon: PlaneTakeoff, color: "text-emerald-500" },
-                { label: "View customers", href: "/customers", icon: Users, color: "text-amber-500" },
+                { label: "Open dispatch board", href: "/dispatch", icon: Radio, color: "text-brand-400" },
+                { label: "Track flights on map", href: "/map", icon: PlaneTakeoff, color: "text-sky-400" },
+                { label: "Manage fleet", href: "/aircraft", icon: PlaneTakeoff, color: "text-emerald-400" },
+                { label: "View customers", href: "/customers", icon: Users, color: "text-amber-400" },
               ].map((action) => (
                 <Link
                   key={action.href}
                   href={action.href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all group"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] transition-all group"
                 >
                   <action.icon className={`w-4 h-4 ${action.color}`} />
-                  <span className="text-xs text-slate-500 group-hover:text-slate-800 transition-colors">
+                  <span className="text-xs text-zinc-400 group-hover:text-zinc-200 transition-colors">
                     {action.label}
                   </span>
-                  <ChevronRight className="w-3 h-3 text-slate-300 ml-auto" />
+                  <ChevronRight className="w-3 h-3 text-zinc-600 ml-auto" />
                 </Link>
               ))}
             </div>

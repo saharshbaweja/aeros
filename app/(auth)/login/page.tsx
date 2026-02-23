@@ -34,12 +34,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+      {/* Gradient mesh blobs */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand-500/[0.06] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-400/[0.04] rounded-full blur-[100px]" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         {/* Logo */}
         <div className="text-center mb-8">
@@ -47,24 +53,24 @@ export default function LoginPage() {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-500/20 border border-white/[0.08] mb-4"
           >
-            <Plane className="w-8 h-8 text-brand-500" />
+            <Plane className="w-8 h-8 text-brand-400" />
           </motion.div>
-          <h1 className="text-display text-slate-800 mb-2">Aeros</h1>
-          <p className="text-body text-slate-500">
+          <h1 className="text-display text-zinc-100 mb-2">Aeros</h1>
+          <p className="text-body text-zinc-400">
             AI Copilot for Aviation Operations
           </p>
         </div>
 
         {/* Login form */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 space-y-4">
           {/* OAuth Providers */}
           <div className="space-y-3">
             <button
               onClick={() => handleOAuthLogin("google")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-200 font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -90,7 +96,7 @@ export default function LoginPage() {
             <button
               onClick={() => handleOAuthLogin("apple")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white text-black font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -101,7 +107,7 @@ export default function LoginPage() {
             <button
               onClick={() => handleOAuthLogin("microsoft")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-200 font-medium rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#F25022" d="M1 1h10v10H1z" />
@@ -115,10 +121,10 @@ export default function LoginPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-white/[0.06]" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-2 text-slate-400">
+              <span className="bg-surface px-2 text-zinc-500">
                 or sign in with email
               </span>
             </div>
@@ -126,11 +132,11 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   type="email"
                   placeholder="you@fbo.com"
@@ -142,11 +148,11 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   type="password"
                   placeholder="Enter password"
@@ -174,11 +180,11 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-small text-slate-500 mt-6">
+        <p className="text-center text-small text-zinc-400 mt-6">
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"
-            className="text-brand-500 hover:text-brand-600 transition-colors font-medium"
+            className="text-brand-400 hover:text-brand-300 transition-colors font-medium"
           >
             Sign up
           </Link>

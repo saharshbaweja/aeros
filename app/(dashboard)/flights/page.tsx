@@ -33,12 +33,12 @@ export default function FlightsPage() {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-brand-500/20 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-brand-400" />
               </div>
               <div>
-                <h1 className="text-heading text-white">Today&apos;s Flights</h1>
-                <p className="text-small text-gray-400">{formatDate(today)}</p>
+                <h1 className="text-heading text-zinc-100">Today&apos;s Flights</h1>
+                <p className="text-small text-zinc-500">{formatDate(today)}</p>
               </div>
             </div>
           </div>
@@ -46,18 +46,18 @@ export default function FlightsPage() {
           {/* Stats */}
           <div className="flex items-center gap-6 mt-4">
             <div>
-              <span className="text-display text-white">{scheduled}</span>
-              <span className="text-small text-gray-500 ml-2">scheduled</span>
+              <span className="text-display text-zinc-100">{scheduled}</span>
+              <span className="text-small text-zinc-500 ml-2">scheduled</span>
             </div>
-            <div className="w-px h-6 bg-surface-400" />
+            <div className="w-px h-6 bg-white/[0.06]" />
             <div>
               <span className="text-display text-emerald-400">{completed}</span>
-              <span className="text-small text-gray-500 ml-2">completed</span>
+              <span className="text-small text-zinc-500 ml-2">completed</span>
             </div>
-            <div className="w-px h-6 bg-surface-400" />
+            <div className="w-px h-6 bg-white/[0.06]" />
             <div>
-              <span className="text-display text-white">{mockFlights.length}</span>
-              <span className="text-small text-gray-500 ml-2">total</span>
+              <span className="text-display text-zinc-100">{mockFlights.length}</span>
+              <span className="text-small text-zinc-500 ml-2">total</span>
             </div>
           </div>
         </motion.div>
@@ -69,7 +69,7 @@ export default function FlightsPage() {
           transition={{ delay: 0.1 }}
           className="flex items-center gap-2 mb-6"
         >
-          <Filter className="w-4 h-4 text-gray-500" />
+          <Filter className="w-4 h-4 text-zinc-500" />
           {filters.map((filter) => (
             <Button
               key={filter}

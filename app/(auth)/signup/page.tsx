@@ -29,36 +29,42 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+      {/* Gradient mesh blobs */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand-500/[0.06] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-400/[0.04] rounded-full blur-[100px]" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
           <motion.div
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-500/20 border border-white/[0.08] mb-4"
           >
-            <Plane className="w-8 h-8 text-brand-500" />
+            <Plane className="w-8 h-8 text-brand-400" />
           </motion.div>
-          <h1 className="text-display text-slate-800 mb-2">Get Started</h1>
-          <p className="text-body text-slate-500">
+          <h1 className="text-display text-zinc-100 mb-2">Get Started</h1>
+          <p className="text-body text-zinc-400">
             Set up your FBO in under 2 minutes
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 FBO Name
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   placeholder="SkyHaven FBO"
                   value={formData.fboName}
@@ -71,11 +77,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   placeholder="Sarah Johnson"
                   value={formData.fullName}
@@ -88,11 +94,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   type="email"
                   placeholder="sarah@skyhaven.com"
@@ -106,11 +112,11 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-small text-slate-600 font-medium">
+              <label className="text-small text-zinc-400 font-medium">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <Input
                   type="password"
                   placeholder="At least 8 characters"
@@ -140,11 +146,11 @@ export default function SignupPage() {
           </form>
         </div>
 
-        <p className="text-center text-small text-slate-500 mt-6">
+        <p className="text-center text-small text-zinc-400 mt-6">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-brand-500 hover:text-brand-600 transition-colors font-medium"
+            className="text-brand-400 hover:text-brand-300 transition-colors font-medium"
           >
             Sign in
           </Link>

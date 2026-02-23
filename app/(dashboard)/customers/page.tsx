@@ -45,31 +45,31 @@ const stageConfig: Record<
   CustomerStage,
   { label: string; color: string; bg: string; border: string }
 > = {
-  lead: { label: "Lead", color: "text-slate-500", bg: "bg-slate-50", border: "border-slate-200" },
+  lead: { label: "Lead", color: "text-zinc-400", bg: "bg-white/[0.03]", border: "border-white/[0.06]" },
   discovery: {
     label: "Discovery",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
+    color: "text-amber-400",
+    bg: "bg-amber-500/15",
     border: "border-amber-200",
   },
   student: {
     label: "Student",
-    color: "text-brand-600",
-    bg: "bg-brand-50",
-    border: "border-brand-200",
+    color: "text-brand-400",
+    bg: "bg-brand-500/20",
+    border: "border-brand-500/20",
   },
   private_pilot: {
     label: "Private Pilot",
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/15",
     border: "border-emerald-200",
   },
   renter: { label: "Renter", color: "text-sky-600", bg: "bg-sky-50", border: "border-sky-200" },
   inactive: {
     label: "Inactive",
-    color: "text-slate-400",
-    bg: "bg-slate-50",
-    border: "border-slate-200",
+    color: "text-zinc-500",
+    bg: "bg-white/[0.03]",
+    border: "border-white/[0.06]",
   },
 };
 
@@ -239,12 +239,12 @@ export default function CustomersPage() {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-200 flex items-center justify-center">
                 <Users className="w-5 h-5 text-emerald-500" />
               </div>
               <div>
-                <h1 className="text-heading text-slate-800">Customers</h1>
-                <p className="text-small text-slate-500">
+                <h1 className="text-heading text-zinc-100">Customers</h1>
+                <p className="text-small text-zinc-400">
                   {customers.length} total &bull; ${totalRevenue.toLocaleString()} lifetime revenue
                 </p>
               </div>
@@ -276,7 +276,7 @@ export default function CustomersPage() {
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all whitespace-nowrap ${
                     stageFilter === stage
                       ? `${cfg.bg} ${cfg.border} ${cfg.color}`
-                      : "bg-white border-slate-200 text-slate-500 hover:text-slate-700"
+                      : "bg-white/[0.04] backdrop-blur-xl border-white/[0.06] text-zinc-400 hover:text-zinc-200"
                   }`}
                 >
                   <span className="text-xs font-medium">{cfg.label}</span>
@@ -284,7 +284,7 @@ export default function CustomersPage() {
                     className={`text-[10px] px-1.5 py-0.5 rounded ${
                       stageFilter === stage
                         ? `${cfg.bg} ${cfg.color}`
-                        : "bg-slate-100 text-slate-400"
+                        : "bg-white/[0.06] text-zinc-500"
                     }`}
                   >
                     {count}
@@ -304,13 +304,13 @@ export default function CustomersPage() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden mb-6"
             >
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-slate-800 mb-4">
+              <div className="bg-white/[0.04] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+                <h3 className="text-sm font-semibold text-zinc-100 mb-4">
                   Add New Customer
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs text-slate-500">Name *</label>
+                    <label className="text-xs text-zinc-400">Name *</label>
                     <Input
                       placeholder="Full name"
                       value={addForm.name}
@@ -320,7 +320,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-slate-500">Email</label>
+                    <label className="text-xs text-zinc-400">Email</label>
                     <Input
                       type="email"
                       placeholder="email@example.com"
@@ -331,7 +331,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-slate-500">Phone</label>
+                    <label className="text-xs text-zinc-400">Phone</label>
                     <Input
                       placeholder="+1 (555) 000-0000"
                       value={addForm.phone}
@@ -341,7 +341,7 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-slate-500">Stage</label>
+                    <label className="text-xs text-zinc-400">Stage</label>
                     <select
                       value={addForm.stage}
                       onChange={(e) =>
@@ -350,7 +350,7 @@ export default function CustomersPage() {
                           stage: e.target.value as CustomerStage,
                         })
                       }
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-2 focus:ring-brand-500/30 rounded-xl px-3 py-2.5 text-sm"
                     >
                       {stages.map((s) => (
                         <option key={s} value={s}>
@@ -360,7 +360,7 @@ export default function CustomersPage() {
                     </select>
                   </div>
                   <div className="col-span-2 space-y-1">
-                    <label className="text-xs text-slate-500">Notes</label>
+                    <label className="text-xs text-zinc-400">Notes</label>
                     <Input
                       placeholder="How did they find you? Any preferences?"
                       value={addForm.notes}
@@ -389,13 +389,13 @@ export default function CustomersPage() {
 
         {/* Search */}
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="text"
             placeholder="Search customers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400 placeholder:text-slate-400 shadow-sm"
+            className="w-full bg-white/[0.04] border border-white/[0.08] text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-2 focus:ring-brand-500/30 rounded-xl pl-10 pr-4 py-2.5 text-sm"
           />
         </div>
 
@@ -414,16 +414,16 @@ export default function CustomersPage() {
                 onClick={() =>
                   setSelectedId(isSelected ? null : customer.id)
                 }
-                className={`bg-white border rounded-xl p-4 cursor-pointer transition-all shadow-sm ${
+                className={`bg-white/[0.04] backdrop-blur-xl border rounded-2xl p-4 cursor-pointer transition-all ${
                   isSelected
                     ? "border-brand-300 ring-1 ring-brand-200"
-                    : "border-slate-200 hover:border-slate-300"
+                    : "border-white/[0.06] hover:border-zinc-600"
                 }`}
               >
                 <div className="flex items-center gap-4">
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-slate-500">
+                  <div className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.06] flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-zinc-400">
                       {customer.name
                         .split(" ")
                         .map((n) => n[0])
@@ -434,7 +434,7 @@ export default function CustomersPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-800 truncate">
+                      <span className="text-sm font-medium text-zinc-100 truncate">
                         {customer.name}
                       </span>
                       <span
@@ -443,7 +443,7 @@ export default function CustomersPage() {
                         {cfg.label}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-0.5 text-[11px] text-slate-500">
+                    <div className="flex items-center gap-3 mt-0.5 text-[11px] text-zinc-400">
                       <span>{customer.email}</span>
                       <span>&bull;</span>
                       <span>Last flight: {customer.last_flight}</span>
@@ -453,16 +453,16 @@ export default function CustomersPage() {
                   {/* Stats */}
                   <div className="hidden md:flex items-center gap-6 flex-shrink-0">
                     <div className="text-right">
-                      <p className="font-mono text-xs text-slate-700">
+                      <p className="font-mono text-xs text-zinc-200">
                         {customer.total_flights}
                       </p>
-                      <p className="text-[10px] text-slate-400">flights</p>
+                      <p className="text-[10px] text-zinc-500">flights</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono text-xs text-emerald-600">
+                      <p className="font-mono text-xs text-emerald-400">
                         ${customer.total_revenue.toLocaleString()}
                       </p>
-                      <p className="text-[10px] text-slate-400">revenue</p>
+                      <p className="text-[10px] text-zinc-500">revenue</p>
                     </div>
                   </div>
                 </div>
@@ -476,13 +476,13 @@ export default function CustomersPage() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="mt-3 pt-3 border-t border-slate-200">
+                      <div className="mt-3 pt-3 border-t border-white/[0.06]">
                         {/* Contact */}
                         <div className="flex items-center gap-4 mb-3">
                           <a
                             href={`mailto:${customer.email}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-700 transition-all"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-xs text-zinc-400 hover:text-zinc-200 transition-all"
                           >
                             <Mail className="w-3 h-3" />
                             Email
@@ -490,7 +490,7 @@ export default function CustomersPage() {
                           <a
                             href={`tel:${customer.phone}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 hover:text-slate-700 transition-all"
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg text-xs text-zinc-400 hover:text-zinc-200 transition-all"
                           >
                             <Phone className="w-3 h-3" />
                             Call
@@ -499,8 +499,8 @@ export default function CustomersPage() {
 
                         {/* Notes */}
                         {customer.notes && (
-                          <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg mb-3">
-                            <p className="text-xs text-slate-600">
+                          <div className="p-2.5 bg-white/[0.03] border border-white/[0.06] rounded-lg mb-3">
+                            <p className="text-xs text-zinc-300">
                               {customer.notes}
                             </p>
                           </div>
@@ -508,7 +508,7 @@ export default function CustomersPage() {
 
                         {/* Stage update */}
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[10px] text-slate-400 mr-1">
+                          <span className="text-[10px] text-zinc-500 mr-1">
                             Move to:
                           </span>
                           {stages
@@ -537,8 +537,8 @@ export default function CustomersPage() {
 
         {filtered.length === 0 && (
           <div className="text-center py-12">
-            <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">No customers found</p>
+            <Users className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+            <p className="text-sm text-zinc-400">No customers found</p>
           </div>
         )}
       </div>

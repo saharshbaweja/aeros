@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Plane, Clock, User } from "lucide-react";
 import { Flight } from "@/types";
-import { formatTime, getServiceTypeLabel, getStatusColor } from "@/lib/utils";
+import { formatTime, getServiceTypeLabel } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface FlightTimelineProps {
@@ -29,19 +29,17 @@ export default function FlightTimeline({ flights }: FlightTimelineProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="group relative flex gap-4 p-4 bg-surface-200 border border-surface-400 rounded-xl hover:border-surface-500 transition-all cursor-pointer"
+          className="group relative flex gap-4 p-4 glass rounded-2xl hover:bg-white/[0.06] transition-all cursor-pointer"
         >
-          {/* Time column */}
           <div className="w-16 shrink-0 text-center">
-            <span className="font-mono text-body text-white font-semibold">
+            <span className="font-mono text-body text-zinc-100 font-semibold">
               {formatTime(flight.flight_time).split(" ")[0]}
             </span>
-            <span className="block font-mono text-xs text-gray-500">
+            <span className="block font-mono text-xs text-zinc-500">
               {formatTime(flight.flight_time).split(" ")[1]}
             </span>
           </div>
 
-          {/* Timeline line */}
           <div className="flex flex-col items-center">
             <div
               className={`w-3 h-3 rounded-full mt-1 ${
@@ -53,14 +51,13 @@ export default function FlightTimeline({ flights }: FlightTimelineProps) {
               }`}
             />
             {i < sorted.length - 1 && (
-              <div className="w-px flex-1 bg-surface-400 mt-1" />
+              <div className="w-px flex-1 bg-white/[0.06] mt-1" />
             )}
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0 pb-2">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-body text-white font-medium">
+              <span className="text-body text-zinc-100 font-medium">
                 {flight.customer_name}
               </span>
               <Badge variant={statusBadge[flight.status]}>
@@ -68,11 +65,11 @@ export default function FlightTimeline({ flights }: FlightTimelineProps) {
               </Badge>
             </div>
 
-            <p className="text-small text-gray-400 mb-2">
+            <p className="text-small text-zinc-500 mb-2">
               {getServiceTypeLabel(flight.service_type)}
             </p>
 
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 text-xs text-zinc-500">
               <span className="flex items-center gap-1">
                 <Plane className="w-3 h-3" />
                 <span className="font-mono">
@@ -92,7 +89,6 @@ export default function FlightTimeline({ flights }: FlightTimelineProps) {
             </div>
           </div>
 
-          {/* Duration bar */}
           <div className="hidden sm:flex items-center">
             <div
               className={`h-2 rounded-full ${
@@ -111,7 +107,7 @@ export default function FlightTimeline({ flights }: FlightTimelineProps) {
       ))}
 
       {flights.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-zinc-500">
           <Plane className="w-8 h-8 mx-auto mb-3 opacity-40" />
           <p className="text-body">No flights scheduled</p>
         </div>
