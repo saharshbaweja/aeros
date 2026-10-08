@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, Network, Sparkles } from "lucide-react";
+import { ArrowUp, FileSearch2 } from "lucide-react";
 import type { ChatMessage } from "@/types";
 
 interface ChatThreadProps {
@@ -13,7 +13,7 @@ interface ChatThreadProps {
 
 const starterQuestions = [
   "What changed for this mission?",
-  "What if we leave 45 minutes later?",
+  "What changes if we leave 45 minutes later?",
   "Which downstream dependencies are exposed?",
 ];
 
@@ -35,26 +35,27 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+    <div className="flex h-full flex-col">
+      <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
         {messages.length === 0 && (
-          <div className="h-full flex flex-col justify-center">
-            <div className="w-12 h-12 rounded-2xl border border-brand-400/15 bg-brand-500/[0.08] flex items-center justify-center">
-              <Network className="w-5 h-5 text-brand-300" />
+          <div className="pt-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.025]">
+              <FileSearch2 className="h-3.5 w-3.5 text-zinc-500" />
             </div>
-            <h3 className="text-base font-semibold text-zinc-100 mt-5">Ask the operation.</h3>
-            <p className="text-xs leading-5 text-zinc-600 mt-2 max-w-[310px]">
-              Ask Aeros reasons over the same mission state, specialist claims, evidence and constraints powering the command center.
+            <h3 className="mt-4 text-sm font-semibold text-zinc-100">Ask about this operation</h3>
+            <p className="mt-2 max-w-[320px] text-[11px] leading-5 text-zinc-600">
+              Answers use the same mission context, evidence and constraints shown in the command center. Missing information stays explicit.
             </p>
-            <div className="space-y-2 mt-6">
+            <div className="mt-5 border-t border-white/[0.06]">
               {starterQuestions.map((question) => (
                 <button
                   key={question}
                   type="button"
                   onClick={() => onSendMessage(question)}
-                  className="w-full text-left rounded-xl border border-white/[0.06] bg-white/[0.025] px-3.5 py-3 text-[11px] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] transition-colors"
+                  className="group flex w-full items-center justify-between gap-3 border-b border-white/[0.05] py-3 text-left text-[11px] text-zinc-500 transition-colors hover:text-zinc-200"
                 >
-                  {question}
+                  <span>{question}</span>
+                  <span className="text-zinc-800 transition-colors group-hover:text-zinc-500">↗</span>
                 </button>
               ))}
             </div>
@@ -65,54 +66,49 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
           {messages.map((message) => (
             <motion.div
               key={message.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              className={message.role === "user" ? "pl-8" : "pr-4"}
             >
+              <div className="mb-1.5 flex items-center gap-2 text-[9px] font-medium uppercase tracking-[0.1em] text-zinc-700">
+                {message.role === "user" ? "You" : "Aeros"}
+                <span className="font-mono font-normal normal-case tracking-normal text-zinc-800">
+                  {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
               <div
-                className={`max-w-[88%] rounded-2xl px-4 py-3 ${
+                className={`text-xs leading-5 ${
                   message.role === "user"
-                    ? "bg-white text-black"
-                    : "border border-white/[0.06] bg-white/[0.035] text-zinc-300"
+                    ? "rounded-lg border border-white/[0.07] bg-white/[0.04] px-3.5 py-3 text-zinc-300"
+                    : "whitespace-pre-wrap text-zinc-300"
                 }`}
               >
-                {message.role === "assistant" && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-3 h-3 text-brand-300" />
-                    <span className="text-[9px] uppercase tracking-[0.14em] text-brand-300">Aeros</span>
-                  </div>
-                )}
-                <div className="text-xs whitespace-pre-wrap leading-5">{message.content}</div>
-                <div className={`text-[9px] mt-2 ${message.role === "user" ? "text-zinc-500" : "text-zinc-700"}`}>
-                  {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </div>
+                {message.content}
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.035] px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-3 h-3 text-brand-300" />
-                {[0, 1, 2].map((index) => (
-                  <motion.span
-                    key={index}
-                    animate={{ opacity: [0.25, 1, 0.25] }}
-                    transition={{ duration: 1.1, repeat: Infinity, delay: index * 0.16 }}
-                    className="w-1.5 h-1.5 rounded-full bg-brand-300"
-                  />
-                ))}
-              </div>
+          <div className="pr-4">
+            <div className="mb-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-zinc-700">Aeros</div>
+            <div className="flex items-center gap-1.5 py-1">
+              {[0, 1, 2].map((index) => (
+                <motion.span
+                  key={index}
+                  animate={{ opacity: [0.18, 0.8, 0.18] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: index * 0.14 }}
+                  className="h-1 w-1 rounded-full bg-zinc-500"
+                />
+              ))}
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-white/[0.06]">
-        <div className="flex items-end gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-2 focus-within:border-brand-400/25 transition-colors">
+      <div className="border-t border-white/[0.06] p-4">
+        <div className="rounded-lg border border-white/[0.09] bg-black/20 p-2 transition-colors focus-within:border-white/[0.16]">
           <textarea
             ref={inputRef}
             value={input}
@@ -127,22 +123,24 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
                 submit();
               }
             }}
-            placeholder="Ask about this mission..."
+            placeholder="Ask about Mission 142…"
             rows={1}
             disabled={isLoading}
-            className="min-h-10 flex-1 resize-none bg-transparent px-2.5 py-2 text-xs leading-5 text-zinc-200 placeholder:text-zinc-700 outline-none"
+            className="min-h-10 w-full resize-none bg-transparent px-1.5 py-1.5 text-xs leading-5 text-zinc-200 outline-none placeholder:text-zinc-700"
           />
-          <button
-            type="button"
-            onClick={submit}
-            disabled={!input.trim() || isLoading}
-            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center disabled:opacity-25 transition-opacity flex-shrink-0"
-            aria-label="Send to Aeros"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
+          <div className="flex items-center justify-between gap-3 px-1 pt-1">
+            <span className="text-[8px] text-zinc-800">Enter to send · Shift+Enter for new line</span>
+            <button
+              type="button"
+              onClick={submit}
+              disabled={!input.trim() || isLoading}
+              className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-100 text-zinc-950 transition-opacity disabled:opacity-20"
+              aria-label="Send to Aeros"
+            >
+              <ArrowUp className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
-        <div className="text-[8px] text-zinc-700 mt-2 px-1">Uses live context where connected. Missing inputs remain explicit.</div>
       </div>
     </div>
   );
