@@ -1,421 +1,299 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Plane,
-  LayoutDashboard,
-  Radio,
-  PlaneTakeoff,
-  Settings,
-  Command,
-  MessageCircle,
-  X,
-  Users,
-  Map,
-  Sparkles,
-} from "lucide-react";
-import CommandBar from "@/components/command-bar";
-import ChatThread from "@/components/chat-thread";
-import { ChatMessage } from "@/types";
-import { mockFlights, mockAlerts, mockWeather, mockAircraft } from "@/lib/mock-data";
-import { AdsbAircraft } from "@/app/api/adsb/route";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-
-const FlightMap = dynamic(() => import("@/components/flight-map"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full bg-surface flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-small text-zinc-500">Loading map...</p>
-      </div>
-    </div>
-  ),
-});
+import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Gauge,
+  Map,
+  Plane,
+  PlaneTakeoff,
+  Radio,
+  Settings,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
+import ChatThread from "@/components/chat-thread";
+import type { ChatMessage } from "@/types";
 
 const navItems = [
-  { href: "/", icon: LayoutDashboard, label: "Home", shortcut: "1" },
+  { href: "/dashboard", icon: Gauge, label: "Command", shortcut: "1" },
   { href: "/dispatch", icon: Radio, label: "Dispatch", shortcut: "2" },
   { href: "/map", icon: Map, label: "Map", shortcut: "3" },
   { href: "/aircraft", icon: PlaneTakeoff, label: "Fleet", shortcut: "4" },
-  { href: "/customers", icon: Users, label: "Customers", shortcut: "5" },
+  { href: "/customers", icon: Users, label: "People", shortcut: "5" },
   { href: "/settings", icon: Settings, label: "Settings", shortcut: "," },
 ];
 
-function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
+const demoMission = {
+  flightId: "AEROS-DEMO-142",
+  departure: "KPDK",
+  destination: "KCHA",
+  alternates: ["KRMG"],
+  aircraft: { tailNumber: "N731GT", type: "C172" },
+};
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [commandBarOpen, setCommandBarOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [adsbData, setAdsbData] = useState<AdsbAircraft[]>([]);
 
-  const isMapPage = pathname === "/map";
-
-  const scheduledFlights = mockFlights.filter((f) => f.status === "scheduled");
-  const alerts = mockAlerts.filter((a) => a.status === "active");
-
-  const fetchAdsb = useCallback(async () => {
-    try {
-      const res = await fetch("/api/adsb");
-      const data = await res.json();
-      setAdsbData(data.aircraft || []);
-    } catch {
-      // Keep existing data
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAdsb();
-    const interval = setInterval(fetchAdsb, 10000);
-    return () => clearInterval(interval);
-  }, [fetchAdsb]);
-
-  const handleSendMessage = useCallback(
+  const sendToAeros = useCallback(
     async (content: string) => {
       const userMessage: ChatMessage = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         role: "user",
         content,
         timestamp: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, userMessage]);
+      const nextMessages = [...messages, userMessage];
+      setMessages(nextMessages);
       setIsLoading(true);
 
       try {
-        const res = await fetch("/api/chat", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...messages, userMessage].map((m) => ({
-              role: m.role,
-              content: m.content,
+            messages: nextMessages.map((message) => ({
+              role: message.role,
+              content: message.content,
             })),
+            mission: demoMission,
           }),
         });
 
-        const data = await res.json();
-
-        const aiMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content:
-            data.message ||
-            "I'm having trouble connecting. Please check that the OpenAI API key is configured.",
-          timestamp: new Date().toISOString(),
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
+        const data = await response.json();
+        setMessages((current) => [
+          ...current,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content:
+              data.message ||
+              "Aeros could not build a supported answer from the current mission context.",
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       } catch {
-        const errorMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content:
-            "I'm currently running in demo mode. To enable AI responses, add your OpenAI API key to .env.local.\n\nHere's what I can tell you:\n- You have " +
-            scheduledFlights.length +
-            " flights scheduled today\n- " +
-            alerts.length +
-            " active alerts need attention\n- Weather is " +
-            mockWeather.flight_category,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        setMessages((current) => [
+          ...current,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content:
+              "The operational intelligence service is unavailable. Live facts have not been guessed or substituted with demo data.",
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       } finally {
         setIsLoading(false);
       }
     },
-    [messages, scheduledFlights.length, alerts.length]
+    [messages]
   );
 
   useEffect(() => {
-    const q = searchParams.get("q");
-    if (q) {
-      setChatOpen(true);
-      handleSendMessage(q);
-      window.history.replaceState(null, "", pathname);
-    }
+    const params = new URLSearchParams(window.location.search);
+    const question = params.get("q");
+    if (!question) return;
+
+    setChatOpen(true);
+    void sendToAeros(question);
+    window.history.replaceState(null, "", pathname);
+    // Run once for link-generated Ask Aeros prompts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setCommandBarOpen(true);
-      }
-      if ((e.metaKey || e.ctrlKey) && !e.shiftKey) {
-        const item = navItems.find((n) => n.shortcut === e.key);
-        if (item) {
-          e.preventDefault();
-          router.push(item.href);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && !event.shiftKey) {
+        const destination = navItems.find((item) => item.shortcut === event.key);
+        if (destination) {
+          event.preventDefault();
+          router.push(destination.href);
         }
       }
-      if (e.key === "Escape") {
-        setCommandBarOpen(false);
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setChatOpen(true);
       }
+
+      if (event.key === "Escape") setChatOpen(false);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [router]);
 
-  const handleCommandSubmit = (message: string) => {
-    setChatOpen(true);
-    handleSendMessage(message);
-  };
-
   return (
-    <div className="min-h-screen bg-surface flex relative overflow-hidden">
-      {/* Background gradient mesh */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-brand-500/[0.03] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-accent-400/[0.02] rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-600/[0.02] rounded-full blur-[80px]" />
+    <div className="h-screen bg-surface text-zinc-100 flex overflow-hidden relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute -top-72 -left-64 w-[720px] h-[720px] rounded-full bg-brand-500/[0.035] blur-[130px]" />
+        <div className="absolute -bottom-72 right-0 w-[640px] h-[640px] rounded-full bg-cyan-400/[0.02] blur-[130px]" />
       </div>
 
-      {/* Persistent background map */}
-      {isMapPage && (
-        <div className="fixed inset-0 z-0">
-          <FlightMap
-            adsbAircraft={adsbData}
-            fleet={mockAircraft}
-            filter="all"
-            selectedIcao={null}
-            onSelectAircraft={() => {}}
-          />
-        </div>
-      )}
-
-      {/* Sidebar Nav - Arc style */}
-      <aside className="hidden md:flex w-[68px] flex-col items-center py-4 bg-white/[0.03] backdrop-blur-xl border-r border-white/[0.06] flex-shrink-0 z-30">
-        {/* Logo */}
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center mb-6 shadow-lg shadow-brand-500/25 animate-glow">
-          <Plane className="w-5 h-5 text-white" />
-        </div>
+      <aside className="hidden md:flex w-[72px] flex-col items-center py-4 border-r border-white/[0.06] bg-[#0a0a0c]/85 backdrop-blur-xl z-30 flex-shrink-0">
+        <Link
+          href="/dashboard"
+          className="w-10 h-10 rounded-2xl bg-white text-black flex items-center justify-center mb-6 shadow-lg"
+          aria-label="Aeros command center"
+        >
+          <Plane className="w-5 h-5" />
+        </Link>
 
         <nav className="flex-1 flex flex-col items-center gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
+            const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group ${
-                  isActive
-                    ? "bg-white/[0.1] text-brand-400"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
+                className={`relative group w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                  active
+                    ? "bg-white/[0.09] text-brand-300"
+                    : "text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05]"
                 }`}
               >
                 <Icon className="w-[18px] h-[18px]" />
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute -left-[10px] w-[3px] h-5 bg-brand-400 rounded-r-full"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                {active && (
+                  <motion.span
+                    layoutId="aeros-nav"
+                    className="absolute -left-[11px] w-[3px] h-5 rounded-r-full bg-brand-400"
                   />
                 )}
-                <div className="absolute left-14 px-2.5 py-1.5 bg-surface-50 border border-white/[0.1] text-zinc-200 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+                <span className="absolute left-14 px-2.5 py-1.5 rounded-lg border border-white/[0.08] bg-[#111114] text-[10px] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-xl z-50">
                   {item.label}
-                  <span className="ml-2 text-zinc-500 font-mono">{"\u2318"}{item.shortcut}</span>
-                </div>
+                  <span className="ml-2 font-mono text-zinc-600">⌘{item.shortcut}</span>
+                </span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-2">
           <button
-            onClick={() => setChatOpen(!chatOpen)}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group relative ${
+            type="button"
+            onClick={() => setChatOpen((open) => !open)}
+            className={`relative group w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
               chatOpen
-                ? "bg-brand-500/20 text-brand-400"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]"
+                ? "bg-brand-500/15 text-brand-300"
+                : "text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05]"
             }`}
+            aria-label="Ask Aeros"
           >
             <Sparkles className="w-[18px] h-[18px]" />
-            <div className="absolute left-14 px-2.5 py-1.5 bg-surface-50 border border-white/[0.1] text-zinc-200 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
-              AI Copilot
-            </div>
+            <span className="absolute left-14 px-2.5 py-1.5 rounded-lg border border-white/[0.08] bg-[#111114] text-[10px] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-xl">
+              Ask Aeros · ⌘K
+            </span>
           </button>
-          <button
-            onClick={() => setCommandBarOpen(true)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-all duration-200 group relative"
-          >
-            <Command className="w-[18px] h-[18px]" />
-            <div className="absolute left-14 px-2.5 py-1.5 bg-surface-50 border border-white/[0.1] text-zinc-200 rounded-lg text-xs whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
-              Command Bar
-              <span className="ml-2 text-zinc-500 font-mono">{"\u2318"}K</span>
-            </div>
-          </button>
+          <Link href="/" className="text-[8px] uppercase tracking-[0.14em] text-zinc-700 hover:text-zinc-500 transition-colors">
+            Site
+          </Link>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden flex z-10">
-        {/* Content panel */}
-        <div
-          className={`${
-            isMapPage
-              ? "w-0 md:w-0 overflow-hidden"
-              : "w-full flex-1"
-          } transition-all duration-300 relative`}
-        >
-          {/* Mobile header */}
-          <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-surface/90 backdrop-blur-xl">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center">
-                <Plane className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-body font-semibold text-zinc-100">Aeros</span>
+      <div className="flex-1 min-w-0 flex flex-col relative z-10">
+        <header className="md:hidden h-14 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#0a0a0c]/90 backdrop-blur-xl z-30">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center">
+              <Plane className="w-4 h-4" />
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setChatOpen(!chatOpen)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  chatOpen ? "bg-brand-500/20 text-brand-400" : "bg-white/[0.06] text-zinc-400"
+            <div>
+              <div className="text-xs font-semibold">Aeros</div>
+              <div className="text-[8px] uppercase tracking-[0.15em] text-zinc-600">operations</div>
+            </div>
+          </Link>
+          <button
+            type="button"
+            onClick={() => setChatOpen(true)}
+            className="w-9 h-9 rounded-xl border border-white/[0.07] bg-white/[0.035] flex items-center justify-center text-brand-300"
+            aria-label="Ask Aeros"
+          >
+            <Sparkles className="w-4 h-4" />
+          </button>
+        </header>
+
+        <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+
+        <nav className="md:hidden h-16 px-2 border-t border-white/[0.06] bg-[#0a0a0c]/95 backdrop-blur-xl flex items-center justify-around z-30">
+          {navItems.slice(0, 5).map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`min-w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-1 text-[9px] transition-colors ${
+                  active ? "text-brand-300 bg-brand-500/[0.08]" : "text-zinc-600"
                 }`}
               >
-                <Sparkles className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setCommandBarOpen(true)}
-                className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center text-zinc-400"
-              >
-                <Command className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+                <Icon className="w-4 h-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
 
-          {/* Mobile bottom nav */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 flex items-center justify-around py-2 px-4 border-t border-white/[0.06] bg-surface/90 backdrop-blur-xl z-40">
-            {navItems.slice(0, 5).map((item) => {
-              const Icon = item.icon;
-              const isActive =
-                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors ${
-                    isActive ? "text-brand-400" : "text-zinc-500"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-[10px]">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="h-full overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={pathname}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.15 }}
-                className="h-full"
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Chat Sidebar */}
-        <AnimatePresence>
-          {chatOpen && (
+      <AnimatePresence>
+        {chatOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close Ask Aeros"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setChatOpen(false)}
+              className="md:hidden fixed inset-0 bg-black/55 backdrop-blur-sm z-40"
+            />
             <motion.aside
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 420, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden md:flex flex-col border-l border-white/[0.06] bg-white/[0.02] backdrop-blur-xl overflow-hidden flex-shrink-0"
-              style={{ width: 420 }}
+              initial={{ x: 440, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 440, opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed md:relative right-0 top-0 bottom-0 w-[min(420px,calc(100vw-20px))] md:w-[420px] flex flex-col border-l border-white/[0.07] bg-[#0c0c0f]/98 md:bg-[#0c0c0f]/90 backdrop-blur-2xl z-50 md:z-30 shadow-[-32px_0_80px_rgba(0,0,0,.25)]"
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+              <div className="h-16 px-5 border-b border-white/[0.06] flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-9 h-9 rounded-xl border border-brand-400/15 bg-brand-500/[0.08] flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-brand-300" />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-zinc-100">Aeros Copilot</span>
+                    <div className="text-sm font-semibold">Ask Aeros</div>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[10px] text-emerald-400">Online</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-[9px] text-zinc-600">grounded in mission context</span>
                     </div>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setChatOpen(false)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-all"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05] transition-colors"
+                  aria-label="Close Ask Aeros"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-hidden">
-                <ChatThread messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
+              <div className="flex-1 min-h-0">
+                <ChatThread messages={messages} onSendMessage={sendToAeros} isLoading={isLoading} />
+              </div>
+              <div className="px-5 py-2.5 border-t border-white/[0.05] text-[9px] leading-4 text-zinc-700">
+                Decision support only. Authority remains with the operator, PIC, dispatcher, and maintenance personnel where applicable.
               </div>
             </motion.aside>
-          )}
-        </AnimatePresence>
-
-        {/* Mobile chat overlay */}
-        <AnimatePresence>
-          {chatOpen && (
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden fixed inset-0 z-50 bg-surface flex flex-col"
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-100">Aeros Copilot</span>
-                </div>
-                <button
-                  onClick={() => setChatOpen(false)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06] transition-all"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <ChatThread messages={messages} onSendMessage={handleSendMessage} isLoading={isLoading} />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      <CommandBar isOpen={commandBarOpen} onClose={() => setCommandBarOpen(false)} onSubmit={handleCommandSubmit} />
+          </>
+        )}
+      </AnimatePresence>
     </div>
-  );
-}
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center h-screen bg-surface">
-          <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <DashboardLayoutInner>{children}</DashboardLayoutInner>
-    </Suspense>
   );
 }
