@@ -3,6 +3,7 @@ import type {
   AerosOperationalAnalysis,
   FlightContext,
 } from "@/types/flight-context";
+import type { OperationalClaim } from "@/types/operational-graph";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
 
@@ -151,25 +152,29 @@ const analysisSchema = {
   ],
 };
 
-const SYSTEM_PROMPT = `You are the Aeros operational intelligence orchestrator.
+const SYSTEM_PROMPT = `You are the Aeros operational intelligence synthesizer.
 
-Your job is to convert structured flight context into a conservative, evidence-backed operational assessment.
+Aeros maintains a shared operational state. Specialist agents publish typed claims backed by external data and deterministic checks. Your job is to synthesize the supplied mission context and claims into a conservative operational assessment and comparable recovery options.
 
 Rules:
-- Never invent weather, aircraft, crew, legal, MEL, NOTAM, performance, or operator constraints.
-- Treat provided data as authoritative only for the fields actually present.
+- Never invent weather, aircraft, crew, legal, MEL, NOTAM, performance, training, maintenance, or operator constraints.
+- Treat specialist claims as assertions with evidence and confidence, not infallible truth.
+- Prefer deterministic claims over model inference when they conflict.
+- Treat provided source data as authoritative only for fields actually present.
 - If information required for a legal or safety conclusion is missing, explicitly identify it in unansweredQuestions.
-- Do not claim an operation is legal, safe, or dispatchable unless the supplied context is sufficient to support that conclusion.
+- Do not claim an operation is legal, safe, or dispatchable unless supplied context is sufficient.
 - Separate observed facts from inference.
-- Every material finding and operational option must cite evidence from the supplied context when evidence exists.
+- Every material finding and option should preserve source evidence when available.
 - Prefer operationally useful options over generic advice.
-- Options may include continue, delay, reroute, divert, change alternate, change aircraft, add fuel, request maintenance action, or hold for more information, but only when supported by context.
-- Confidence must reflect data completeness.
-- This output is decision support, not pilot-in-command or dispatcher authority.
+- Options can include continue, delay, reroute, divert, change alternate, add fuel, swap aircraft, reassign resources, request maintenance action, or hold for more information only when supported by context.
+- Never propose an execution step that bypasses required pilot, dispatcher, maintenance, operator, or regulatory authority.
+- Confidence must reflect data completeness and agent disagreement.
+- This output is decision support, not pilot-in-command, dispatcher, maintenance-control, or regulatory authority.
 `;
 
 export async function analyzeFlightContext(
-  context: FlightContext
+  context: FlightContext,
+  claims: OperationalClaim[] = []
 ): Promise<AerosOperationalAnalysis> {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("OPENAI_API_KEY is not configured");
@@ -179,9 +184,9 @@ export async function analyzeFlightContext(
     model: process.env.AEROS_MODEL || "gpt-6.1-sol",
     reasoning: { effort: "medium" },
     instructions: SYSTEM_PROMPT,
-    input: `Analyze this flight context and return the operational assessment.\n\n${JSON.stringify(
+    input: `Analyze this mission state and return the operational assessment.\n\nMISSION CONTEXT:\n${JSON.stringify(
       context
-    )}`,
+    )}\n\nSPECIALIST CLAIMS:\n${JSON.stringify(claims)}`,
     text: {
       format: {
         type: "json_schema",
