@@ -60,10 +60,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: nextMessages.map((message) => ({
-              role: message.role,
-              content: message.content,
-            })),
+            messages: nextMessages.map((message) => ({ role: message.role, content: message.content })),
             mission: demoMission,
           }),
         });
@@ -74,9 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {
             id: crypto.randomUUID(),
             role: "assistant",
-            content:
-              data.message ||
-              "Aeros could not build a supported answer from the current mission context.",
+            content: data.message || "Aeros could not build a supported answer from the current mission context.",
             timestamp: new Date().toISOString(),
           },
         ]);
@@ -86,8 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {
             id: crypto.randomUUID(),
             role: "assistant",
-            content:
-              "The operational intelligence service is unavailable. Live facts have not been guessed or substituted with demo data.",
+            content: "The operational intelligence service is unavailable. Live facts have not been guessed or substituted with demo data.",
             timestamp: new Date().toISOString(),
           },
         ]);
@@ -102,11 +96,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const params = new URLSearchParams(window.location.search);
     const question = params.get("q");
     if (!question) return;
-
     setChatOpen(true);
     void sendToAeros(question);
     window.history.replaceState(null, "", pathname);
-    // Run once for link-generated Ask Aeros prompts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -133,97 +125,93 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [router]);
 
   return (
-    <div className="h-screen bg-surface text-zinc-100 flex overflow-hidden relative">
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-72 -left-64 w-[720px] h-[720px] rounded-full bg-brand-500/[0.035] blur-[130px]" />
-        <div className="absolute -bottom-72 right-0 w-[640px] h-[640px] rounded-full bg-cyan-400/[0.02] blur-[130px]" />
-      </div>
+    <div className="flex h-screen overflow-hidden bg-[#0b0c0e] text-zinc-100">
+      <aside className="hidden w-[220px] flex-none flex-col border-r border-white/[0.07] bg-[#0d0e10] md:flex">
+        <div className="flex h-[68px] items-center border-b border-white/[0.06] px-4">
+          <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="Aeros command center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-950">
+              <Plane className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-[13px] font-semibold tracking-[-0.02em] text-zinc-100">Aeros</div>
+              <div className="mt-0.5 text-[9px] text-zinc-600">SkyHaven · KPDK</div>
+            </div>
+          </Link>
+        </div>
 
-      <aside className="hidden md:flex w-[72px] flex-col items-center py-4 border-r border-white/[0.06] bg-[#0a0a0c]/85 backdrop-blur-xl z-30 flex-shrink-0">
-        <Link
-          href="/dashboard"
-          className="w-10 h-10 rounded-2xl bg-white text-black flex items-center justify-center mb-6 shadow-lg"
-          aria-label="Aeros command center"
-        >
-          <Plane className="w-5 h-5" />
-        </Link>
+        <div className="flex-1 px-3 py-4">
+          <div className="px-2 pb-2 text-[9px] font-medium uppercase tracking-[0.14em] text-zinc-700">Workspace</div>
+          <nav className="space-y-0.5">
+            {navItems.slice(0, 5).map((item) => {
+              const Icon = item.icon;
+              const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`group flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-[11px] transition-colors ${active ? "bg-white/[0.07] text-zinc-100" : "text-zinc-500 hover:bg-white/[0.035] hover:text-zinc-300"}`}
+                >
+                  <Icon className={`h-3.5 w-3.5 ${active ? "text-zinc-300" : "text-zinc-600 group-hover:text-zinc-400"}`} />
+                  <span>{item.label}</span>
+                  <span className="ml-auto font-mono text-[8px] text-zinc-700">⌘{item.shortcut}</span>
+                </Link>
+              );
+            })}
+          </nav>
 
-        <nav className="flex-1 flex flex-col items-center gap-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative group w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                  active
-                    ? "bg-white/[0.09] text-brand-300"
-                    : "text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05]"
-                }`}
-              >
-                <Icon className="w-[18px] h-[18px]" />
-                {active && (
-                  <motion.span
-                    layoutId="aeros-nav"
-                    className="absolute -left-[11px] w-[3px] h-5 rounded-r-full bg-brand-400"
-                  />
-                )}
-                <span className="absolute left-14 px-2.5 py-1.5 rounded-lg border border-white/[0.08] bg-[#111114] text-[10px] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-xl z-50">
-                  {item.label}
-                  <span className="ml-2 font-mono text-zinc-600">⌘{item.shortcut}</span>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+          <div className="mt-6 px-2 pb-2 text-[9px] font-medium uppercase tracking-[0.14em] text-zinc-700">System</div>
+          <Link
+            href="/settings"
+            className={`group flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-[11px] transition-colors ${pathname.startsWith("/settings") ? "bg-white/[0.07] text-zinc-100" : "text-zinc-500 hover:bg-white/[0.035] hover:text-zinc-300"}`}
+          >
+            <Settings className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400" />
+            Settings
+            <span className="ml-auto font-mono text-[8px] text-zinc-700">⌘,</span>
+          </Link>
+        </div>
 
-        <div className="flex flex-col items-center gap-2">
+        <div className="border-t border-white/[0.06] p-3">
           <button
             type="button"
             onClick={() => setChatOpen((open) => !open)}
-            className={`relative group w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-              chatOpen
-                ? "bg-brand-500/15 text-brand-300"
-                : "text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05]"
-            }`}
-            aria-label="Ask Aeros"
+            className={`flex w-full items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors ${chatOpen ? "border-white/[0.1] bg-white/[0.07]" : "border-white/[0.06] bg-white/[0.025] hover:bg-white/[0.05]"}`}
           >
-            <Sparkles className="w-[18px] h-[18px]" />
-            <span className="absolute left-14 px-2.5 py-1.5 rounded-lg border border-white/[0.08] bg-[#111114] text-[10px] whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-xl">
-              Ask Aeros · ⌘K
-            </span>
+            <Sparkles className="h-3.5 w-3.5 text-zinc-400" />
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-medium text-zinc-200">Ask Aeros</div>
+              <div className="mt-0.5 text-[8px] text-zinc-700">Mission-aware · ⌘K</div>
+            </div>
           </button>
-          <Link href="/" className="text-[8px] uppercase tracking-[0.14em] text-zinc-700 hover:text-zinc-500 transition-colors">
-            Site
+          <Link href="/" className="mt-2 block px-2 py-1 text-[9px] text-zinc-700 transition-colors hover:text-zinc-500">
+            aeros.ai ↗
           </Link>
         </div>
       </aside>
 
-      <div className="flex-1 min-w-0 flex flex-col relative z-10">
-        <header className="md:hidden h-14 px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#0a0a0c]/90 backdrop-blur-xl z-30">
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <header className="flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0e10] px-4 md:hidden">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center">
-              <Plane className="w-4 h-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-950">
+              <Plane className="h-4 w-4" />
             </div>
             <div>
               <div className="text-xs font-semibold">Aeros</div>
-              <div className="text-[8px] uppercase tracking-[0.15em] text-zinc-600">operations</div>
+              <div className="text-[8px] text-zinc-700">Operations</div>
             </div>
           </Link>
           <button
             type="button"
             onClick={() => setChatOpen(true)}
-            className="w-9 h-9 rounded-xl border border-white/[0.07] bg-white/[0.035] flex items-center justify-center text-brand-300"
-            aria-label="Ask Aeros"
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 text-[10px] text-zinc-400"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="h-3.5 w-3.5" />
+            Ask
           </button>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
 
-        <nav className="md:hidden h-16 px-2 border-t border-white/[0.06] bg-[#0a0a0c]/95 backdrop-blur-xl flex items-center justify-around z-30">
+        <nav className="flex h-16 items-center justify-around border-t border-white/[0.06] bg-[#0d0e10] px-2 md:hidden">
           {navItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -231,11 +219,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.href}
                 href={item.href}
-                className={`min-w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-1 text-[9px] transition-colors ${
-                  active ? "text-brand-300 bg-brand-500/[0.08]" : "text-zinc-600"
-                }`}
+                className={`flex h-11 min-w-[54px] flex-col items-center justify-center gap-1 rounded-lg text-[9px] ${active ? "bg-white/[0.06] text-zinc-200" : "text-zinc-600"}`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="h-4 w-4" />
                 {item.label}
               </Link>
             );
@@ -253,42 +239,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setChatOpen(false)}
-              className="md:hidden fixed inset-0 bg-black/55 backdrop-blur-sm z-40"
+              className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm md:hidden"
             />
             <motion.aside
               initial={{ x: 440, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 440, opacity: 0 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed md:relative right-0 top-0 bottom-0 w-[min(420px,calc(100vw-20px))] md:w-[420px] flex flex-col border-l border-white/[0.07] bg-[#0c0c0f]/98 md:bg-[#0c0c0f]/90 backdrop-blur-2xl z-50 md:z-30 shadow-[-32px_0_80px_rgba(0,0,0,.25)]"
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed bottom-0 right-0 top-0 z-50 flex w-[min(420px,calc(100vw-20px))] flex-col border-l border-white/[0.08] bg-[#0d0e10] shadow-[-24px_0_70px_rgba(0,0,0,.35)] md:relative md:z-20 md:w-[420px]"
             >
-              <div className="h-16 px-5 border-b border-white/[0.06] flex items-center justify-between flex-shrink-0">
+              <div className="flex h-[68px] flex-none items-center justify-between border-b border-white/[0.06] px-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl border border-brand-400/15 bg-brand-500/[0.08] flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-brand-300" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.035]">
+                    <Sparkles className="h-3.5 w-3.5 text-zinc-300" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold">Ask Aeros</div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[9px] text-zinc-600">grounded in mission context</span>
+                    <div className="text-xs font-semibold text-zinc-100">Ask Aeros</div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[8px] text-zinc-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Grounded in Mission 142
                     </div>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setChatOpen(false)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 hover:text-zinc-300 hover:bg-white/[0.05] transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-white/[0.04] hover:text-zinc-300"
                   aria-label="Close Ask Aeros"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex-1 min-h-0">
+              <div className="min-h-0 flex-1">
                 <ChatThread messages={messages} onSendMessage={sendToAeros} isLoading={isLoading} />
               </div>
-              <div className="px-5 py-2.5 border-t border-white/[0.05] text-[9px] leading-4 text-zinc-700">
-                Decision support only. Authority remains with the operator, PIC, dispatcher, and maintenance personnel where applicable.
+              <div className="border-t border-white/[0.05] px-5 py-2.5 text-[8px] leading-4 text-zinc-700">
+                Decision support only. Authority remains with the operator, PIC, dispatcher and maintenance personnel where applicable.
               </div>
             </motion.aside>
           </>
