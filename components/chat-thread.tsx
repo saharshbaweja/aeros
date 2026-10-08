@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, ArrowUp } from "lucide-react";
-import { ChatMessage } from "@/types";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUp, Network, Sparkles } from "lucide-react";
+import type { ChatMessage } from "@/types";
 
 interface ChatThreadProps {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
   isLoading: boolean;
 }
+
+const starterQuestions = [
+  "What changed for this mission?",
+  "What if we leave 45 minutes later?",
+  "Which downstream dependencies are exposed?",
+];
 
 export default function ChatThread({ messages, onSendMessage, isLoading }: ChatThreadProps) {
   const [input, setInput] = useState("");
@@ -18,45 +24,37 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    onSendMessage(input.trim());
+  const submit = () => {
+    const question = input.trim();
+    if (!question || isLoading) return;
+    onSendMessage(question);
     setInput("");
-    if (inputRef.current) {
-      inputRef.current.style.height = "auto";
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    }
+    if (inputRef.current) inputRef.current.style.height = "auto";
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4">
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-500/20 flex items-center justify-center mb-5 border border-white/[0.08]">
-              <Sparkles className="w-7 h-7 text-brand-400" />
+          <div className="h-full flex flex-col justify-center">
+            <div className="w-12 h-12 rounded-2xl border border-brand-400/15 bg-brand-500/[0.08] flex items-center justify-center">
+              <Network className="w-5 h-5 text-brand-300" />
             </div>
-            <p className="text-zinc-200 text-body font-medium mb-2">Aeros Flight Copilot</p>
-            <p className="text-zinc-500 text-small max-w-[280px]">
-              Ask about flights, weather, aircraft status, or give operational commands
+            <h3 className="text-base font-semibold text-zinc-100 mt-5">Ask the operation.</h3>
+            <p className="text-xs leading-5 text-zinc-600 mt-2 max-w-[310px]">
+              Ask Aeros reasons over the same mission state, specialist claims, evidence and constraints powering the command center.
             </p>
-            <div className="flex flex-wrap gap-2 mt-6 justify-center">
-              {["What flights today?", "Weather check", "Fleet status"].map((q) => (
+            <div className="space-y-2 mt-6">
+              {starterQuestions.map((question) => (
                 <button
-                  key={q}
-                  onClick={() => onSendMessage(q)}
-                  className="px-3 py-1.5 text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.06] rounded-lg hover:bg-white/[0.08] hover:text-zinc-200 transition-all"
+                  key={question}
+                  type="button"
+                  onClick={() => onSendMessage(question)}
+                  className="w-full text-left rounded-xl border border-white/[0.06] bg-white/[0.025] px-3.5 py-3 text-[11px] text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] transition-colors"
                 >
-                  {q}
+                  {question}
                 </button>
               ))}
             </div>
@@ -67,26 +65,25 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
           {messages.map((message) => (
             <motion.div
               key={message.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                message.role === "user"
-                  ? "bg-brand-500 text-white"
-                  : "bg-white/[0.06] text-zinc-200 border border-white/[0.06]"
-              }`}>
+              <div
+                className={`max-w-[88%] rounded-2xl px-4 py-3 ${
+                  message.role === "user"
+                    ? "bg-white text-black"
+                    : "border border-white/[0.06] bg-white/[0.035] text-zinc-300"
+                }`}
+              >
                 {message.role === "assistant" && (
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
-                      <Sparkles className="w-2.5 h-2.5 text-white" />
-                    </div>
-                    <span className="text-[11px] text-brand-400 font-medium">Aeros</span>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-3 h-3 text-brand-300" />
+                    <span className="text-[9px] uppercase tracking-[0.14em] text-brand-300">Aeros</span>
                   </div>
                 )}
-                <div className="text-small whitespace-pre-wrap leading-relaxed">{message.content}</div>
-                <div className={`text-[10px] mt-1.5 ${message.role === "user" ? "text-brand-200" : "text-zinc-500"}`}>
+                <div className="text-xs whitespace-pre-wrap leading-5">{message.content}</div>
+                <div className={`text-[9px] mt-2 ${message.role === "user" ? "text-zinc-500" : "text-zinc-700"}`}>
                   {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </div>
               </div>
@@ -95,52 +92,57 @@ export default function ChatThread({ messages, onSendMessage, isLoading }: ChatT
         </AnimatePresence>
 
         {isLoading && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="bg-white/[0.06] border border-white/[0.06] rounded-2xl px-4 py-3">
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center">
-                  <Sparkles className="w-2.5 h-2.5 text-white" />
-                </div>
-                <span className="text-[11px] text-brand-400 font-medium">Aeros</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0 }} className="w-1.5 h-1.5 rounded-full bg-brand-400" />
-                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-brand-400" />
-                <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-brand-400" />
+          <div className="flex justify-start">
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.035] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3 text-brand-300" />
+                {[0, 1, 2].map((index) => (
+                  <motion.span
+                    key={index}
+                    animate={{ opacity: [0.25, 1, 0.25] }}
+                    transition={{ duration: 1.1, repeat: Infinity, delay: index * 0.16 }}
+                    className="w-1.5 h-1.5 rounded-full bg-brand-300"
+                  />
+                ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t border-white/[0.06] p-4">
-        <form onSubmit={handleSubmit} className="flex items-end gap-3">
-          <div className="flex-1 relative">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask Aeros anything..."
-              rows={1}
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-body text-zinc-100 placeholder:text-zinc-500 outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/30 transition-all resize-none"
-              disabled={isLoading}
-            />
-          </div>
+      <div className="p-4 border-t border-white/[0.06]">
+        <div className="flex items-end gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-2 focus-within:border-brand-400/25 transition-colors">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(event) => {
+              setInput(event.target.value);
+              event.target.style.height = "auto";
+              event.target.style.height = `${Math.min(event.target.scrollHeight, 120)}px`;
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                submit();
+              }
+            }}
+            placeholder="Ask about this mission..."
+            rows={1}
+            disabled={isLoading}
+            className="min-h-10 flex-1 resize-none bg-transparent px-2.5 py-2 text-xs leading-5 text-zinc-200 placeholder:text-zinc-700 outline-none"
+          />
           <button
-            type="submit"
+            type="button"
+            onClick={submit}
             disabled={!input.trim() || isLoading}
-            className="w-10 h-10 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-30 disabled:hover:bg-brand-500 flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-brand-500/25 flex-shrink-0"
+            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center disabled:opacity-25 transition-opacity flex-shrink-0"
+            aria-label="Send to Aeros"
           >
-            <ArrowUp className="w-4 h-4 text-white" />
+            <ArrowUp className="w-4 h-4" />
           </button>
-        </form>
+        </div>
+        <div className="text-[8px] text-zinc-700 mt-2 px-1">Uses live context where connected. Missing inputs remain explicit.</div>
       </div>
     </div>
   );
