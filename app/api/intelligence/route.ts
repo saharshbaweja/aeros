@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildWeatherContext } from "@/lib/aviation/weather";
 import { analyzeFlightContext } from "@/lib/ai/orchestrator";
+import { runAgentMesh } from "@/lib/agents/blackboard";
 import type { AirportRef, FlightContext } from "@/types/flight-context";
 
 function normalizeAirport(input: string | AirportRef): AirportRef {
@@ -53,20 +54,24 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
+    const mesh = await runAgentMesh(context);
+
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({
         context,
+        mesh,
         analysis: null,
-        mode: "data-only",
+        mode: "data-and-agents",
         warning:
-          "Live aviation data loaded, but OPENAI_API_KEY is not configured so operational analysis was not run.",
+          "Live aviation data and specialist claims loaded, but OPENAI_API_KEY is not configured so final operational synthesis was not run.",
       });
     }
 
-    const analysis = await analyzeFlightContext(context);
+    const analysis = await analyzeFlightContext(context, mesh.claims);
 
     return NextResponse.json({
       context,
+      mesh,
       analysis,
       mode: "live",
     });
