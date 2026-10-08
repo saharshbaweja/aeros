@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aeros - AI Copilot for Aviation Operations",
+  title: "Aeros — The intelligence layer for aviation operations",
   description:
-    "Next-generation AI copilot for FBOs and flight schools. Conversational interface with ambient intelligence.",
+    "Aeros connects schedules, weather, aircraft, pilots, maintenance, training, FAA data and operator policy to understand operational changes, simulate downstream impact and build recovery plans.",
 };
 
 export default function RootLayout({
